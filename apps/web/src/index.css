@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sand: #C4946A;
+  --color-ochre: #B5722A;
+  --color-terracotta: #A0522D;
+  --color-deep-red: #7B3826;
+  --color-bone: #F2E8D9;
+  --color-bone-dark: #E0CEAE;
+  --color-charcoal: #2C201A;
+  --color-bark: #3D2B1F;
+  --color-olive: #6B7C45;
+  --color-sage: #8FA669;
+  --color-sky: #5B8FA8;
+  --color-muted: #9C8068;
+  --color-bg: #1a0e08;
+  --color-border: #4a3020;
+  --color-border-hi: #5a3a22;
+  --font-display: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Lato", sans-serif;
+}
+
+/* Casper — light pearl / blue (ball python) */
+html[data-theme="casper"] {
+  --color-sand: #2a5a8a;
+  --color-ochre: #3a72a8;
+  --color-terracotta: #4a8ab8;
+  --color-deep-red: #2a5a8a;
+  --color-bone: #1a2a3a;
+  --color-bone-dark: #2a3a4a;
+  --color-charcoal: #ffffff;
+  --color-bark: #eef4fa;
+  --color-olive: #3a8a5a;
+  --color-sage: #3a8a5a;
+  --color-sky: #4a8ab8;
+  --color-muted: #7a90a8;
+  --color-bg: #e8edf2;
+  --color-border: #dde4ec;
+  --color-border-hi: #c8d4e0;
+}
+
+/* Arlo — dark warm amber (crested gecko) */
+html[data-theme="arlo"] {
+  --color-sand: #C8943A;
+  --color-ochre: #a07028;
+  --color-terracotta: #E8C878;
+  --color-deep-red: #7a5828;
+  --color-bone: #F2E8D0;
+  --color-bone-dark: #D8C8A0;
+  --color-charcoal: #2e1e0c;
+  --color-bark: #261a0a;
+  --color-olive: #7aaa60;
+  --color-sage: #7aaa60;
+  --color-sky: #E8C878;
+  --color-muted: #8a7050;
+  --color-bg: #1a1008;
+  --color-border: #3e2a10;
+  --color-border-hi: #503818;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+
+@media (max-width: 640px) {
+  #root {
+    padding: 0;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (display-mode: standalone) {
+  #root {
+    padding: 0;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.pet-toggle {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 50;
+  display: flex;
+  gap: 0;
+  padding: 4px;
+  border-radius: 30px;
+  border: 1px solid color-mix(in srgb, var(--color-sand) 35%, transparent);
+  background: color-mix(in srgb, var(--color-charcoal) 85%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+.pet-toggle button {
+  border: none;
+  cursor: pointer;
+  padding: 7px 16px;
+  border-radius: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--color-bone) 40%, transparent);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+html[data-theme="casper"] .pet-toggle button.active {
+  background: linear-gradient(135deg, #c8d8e8, #e8f0f8);
+  color: #1a3a5a;
+  box-shadow: 0 2px 14px rgba(200, 216, 232, 0.4);
+}
+
+html[data-theme="arlo"] .pet-toggle button.active {
+  background: linear-gradient(135deg, #503818, #7a5828);
+  color: #e8c878;
+  box-shadow: 0 2px 14px rgba(200, 148, 58, 0.4);
+}

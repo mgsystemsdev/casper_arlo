@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCHIVE — Erica's Reptile Dashboard (import source)</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Lato',sans-serif;min-height:100vh;padding:20px 12px 40px;transition:background 0.5s;}
+
+/* ── CASPER THEME — light mode, pearl white BEL ──────────── */
+body.casper-theme{background:linear-gradient(160deg,#e8edf2 0%,#f4f6f8 100%);}
+.casper-theme{
+  --primary:#2a5a8a;
+  --primary-dim:#3a72a8;
+  --accent:#4a8ab8;
+  --bg:#ffffff;
+  --bg2:#f0f4f8;
+  --bg3:#e4eaf0;
+  --card:#f8fafc;
+  --border:#dde4ec;
+  --border2:#c8d4e0;
+  --bone:#1a2a3a;
+  --bone-dark:#2a3a4a;
+  --muted:#7a90a8;
+  --sage:#3a8a5a;
+  --warn:#b07a10;
+  --danger:#c04030;
+  --sex-bg:#eef4fa;
+  --sex-border:#aac4e0;
+  --sex-color:#2a5a8a;
+  --header-grad:linear-gradient(135deg,#ffffff 0%,#eef4fa 100%);
+  --tab-bg:#f0f4f8;
+  --stage-bg:#e8f0f8;
+  --stage-border:#2a5a8a;
+  --card-value-color:#1a2a3a;
+}
+
+/* ── ARLO THEME — dark warm amber, pulled from his photo ─── */
+body.arlo-theme{background:linear-gradient(135deg,#1a1008 0%,#231508 100%);}
+.arlo-theme{
+  --primary:#C8943A;
+  --primary-dim:#a07028;
+  --accent:#E8C878;
+  --bg:#1e1408;
+  --bg2:#261a0a;
+  --bg3:#161008;
+  --card:#2e1e0c;
+  --border:#3e2a10;
+  --border2:#503818;
+  --bone:#F2E8D0;
+  --bone-dark:#D8C8A0;
+  --muted:#8a7050;
+  --sage:#7aaa60;
+  --warn:#D4A830;
+  --danger:#E06050;
+  --sex-bg:#2a1e08;
+  --sex-border:#7a5a20;
+  --sex-color:#C8943A;
+  --header-grad:linear-gradient(135deg,#2e1e0c 0%,#160e04 100%);
+  --tab-bg:#160e04;
+  --stage-bg:#2a1a08;
+  --stage-border:#C8943A;
+  --card-value-color:#F2E8D0;
+}
+
+
+/* ── ARCHIVE BANNER ──────────────────────────────────────── */
+.archive-banner{position:sticky;top:0;z-index:200;background:#3a2010;color:#F2E8D0;border-bottom:2px solid #C8943A;padding:12px 16px;font-family:'Lato',sans-serif;font-size:13px;line-height:1.45;}
+.archive-banner strong{color:#E8C878;}
+.archive-banner code{font-family:'JetBrains Mono',monospace;font-size:11px;color:#E8C878;}
+.archive-banner .steps{margin-top:6px;color:rgba(242,232,208,0.85);}
+body{padding-top:0;}
+/* ── TOGGLE BUTTON ───────────────────────────────────────── */
+.toggle-wrap{position:fixed;top:16px;right:16px;z-index:100;display:flex;align-items:center;gap:0;background:rgba(30,20,8,0.7);border-radius:30px;padding:4px;border:1px solid rgba(200,148,58,0.3);backdrop-filter:blur(10px);}
+.casper-theme~.toggle-wrap,.toggle-wrap{background:rgba(30,20,8,0.7);}
+.tog-btn{padding:7px 18px;border-radius:24px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:0.06em;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.35);transition:all 0.25s;}
+.tog-btn.active-casper{background:linear-gradient(135deg,#c8d8e8,#e8f0f8);color:#1a3a5a;box-shadow:0 2px 14px rgba(200,216,232,0.4);}
+.tog-btn.active-arlo{background:linear-gradient(135deg,#503818,#7a5828);color:#E8C878;box-shadow:0 2px 14px rgba(200,148,58,0.4);}
+.export-mig{position:fixed;top:16px;left:16px;z-index:100;}
+.export-mig button{padding:8px 14px;border-radius:10px;border:1px solid rgba(200,148,58,0.45);background:rgba(30,20,8,0.85);color:#E8C878;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.04em;cursor:pointer;backdrop-filter:blur(10px);}
+.export-mig button:hover{background:rgba(50,35,12,0.95);}
+.casper-theme .export-mig button{border-color:rgba(42,90,138,0.4);background:rgba(255,255,255,0.9);color:#1a3a5a;}
+
+/* ── DASHBOARD SHELL ─────────────────────────────────────── */
+.db{width:100%;max-width:860px;margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid var(--border2);transition:all 0.4s;}
+.db-header{background:var(--header-grad);border-bottom:1px solid var(--border2);padding:20px 24px 16px;}
+.db-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.snake-name{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--bone);line-height:1.1;}
+.snake-species{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:3px;letter-spacing:0.05em;}
+.morph-tag{font-size:12px;color:var(--accent);margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.owner-tag{font-size:13px;color:var(--bone-dark);margin-top:5px;}
+.owner-tag span{color:var(--primary);}
+.status-pill{background:rgba(0,80,0,0.3);border:1px solid var(--sage);color:var(--sage);font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:20px;white-space:nowrap;}
+.sex-badge{background:var(--sex-bg);border:1px solid var(--sex-border);color:var(--sex-color);font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:20px;margin-top:6px;display:inline-block;}
+.live-clock{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:6px;letter-spacing:0.04em;}
+
+/* ── AGE COUNTER ─────────────────────────────────────────── */
+.age-counter{display:flex;gap:10px;align-items:stretch;}
+.age-box{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;text-align:center;flex:1;}
+.age-box-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--primary);line-height:1;}
+.age-box-label{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:4px;}
+.age-box.dob{flex:2;}
+.age-box.dob .age-box-val{font-size:14px;color:var(--bone-dark);font-family:'JetBrains Mono',monospace;font-weight:400;margin-top:2px;}
+.age-stage-pill{display:inline-block;background:var(--stage-bg);border:1px solid var(--stage-border);color:var(--primary);font-size:11px;font-family:'JetBrains Mono',monospace;padding:3px 12px;border-radius:20px;margin-top:10px;}
+
+/* ── TABS ────────────────────────────────────────────────── */
+.tabs{display:flex;background:var(--tab-bg);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:10px 16px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.18s;background:none;border-left:none;border-right:none;border-top:none;border-radius:0;}
+.tab:hover{color:var(--bone-dark);}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+/* ── PANELS ──────────────────────────────────────────────── */
+.panel{display:none;padding:20px 24px 28px;background:var(--bg);}
+.panel.active{display:block;}
+
+/* ── CARDS & GRIDS ───────────────────────────────────────── */
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.card{background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;transition:border-color 0.3s;}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
+.card-value{font-family:'Playfair Display',serif;font-size:22px;color:var(--card-value-color,var(--bone));font-weight:600;}
+.card-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin:20px 0 10px;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.info-row:last-child{border-bottom:none;}
+.info-label{color:var(--muted);}
+.info-val{color:var(--bone);font-weight:400;text-align:right;}
+.info-val.hi{color:var(--primary);font-family:'JetBrains Mono',monospace;}
+/* light mode overrides for casper */
+.casper-theme .snake-name{color:#1a2a3a;}
+.casper-theme .snake-species{color:#7a90a8;}
+.casper-theme .morph-tag{color:#2a5a8a;}
+.casper-theme .owner-tag{color:#3a4a5a;}
+.casper-theme .live-clock{color:#8a9aaa;}
+.casper-theme .age-box-val{color:#2a5a8a;}
+.casper-theme .age-box.dob .age-box-val{color:#3a4a5a;}
+.casper-theme .age-stage-pill{color:#2a5a8a;}
+.casper-theme .tab{color:#8a9aaa;}
+.casper-theme .tab:hover{color:#1a2a3a;}
+.casper-theme .tab.active{color:#2a5a8a;border-bottom-color:#2a5a8a;}
+.casper-theme .card-title{color:#8a9aaa;}
+.casper-theme .info-label{color:#8a9aaa;}
+.casper-theme .info-val{color:#1a2a3a;}
+.casper-theme .log-table td{color:#2a3a4a;}
+.casper-theme .log-table th{color:#8a9aaa;}
+.casper-theme .prey-table td{color:#2a3a4a;}
+.casper-theme .prey-table th{color:#8a9aaa;}
+.casper-theme .health-item-text{color:#2a3a4a;}
+.casper-theme .status-pill{background:rgba(58,138,90,0.12);border-color:#3a8a5a;color:#3a8a5a;}
+.casper-theme .section-label{color:#8a9aaa;}
+.casper-theme .enc-zone-temp{color:#2a3a4a;}
+.casper-theme .enc-zone-label{color:#8a9aaa;}
+.casper-theme .log-form-title{color:#2a5a8a;}
+.casper-theme .enc-hot{background:linear-gradient(to right,#dde8f4,#e8f0f8);}
+.casper-theme .enc-mid{background:#f4f6f8;}
+.casper-theme .enc-cool{background:linear-gradient(to left,#eef4fa,#f4f8fc);}
+.casper-theme .prey-table tr.cur td{background:#e8f0f8;color:#1a2a3a;}
+.casper-theme .notes-input{background:#f8fafc;border-color:#c8d4e0;color:#1a2a3a;}
+.cur-hl{background:rgba(42,90,138,0.06);border-radius:6px;padding:8px;}
+.arlo-theme .cur-hl{background:rgba(200,148,58,0.08);}
+
+/* ── PREY / INFO TABLES ──────────────────────────────────── */
+.prey-table{width:100%;border-collapse:collapse;margin-top:6px;}
+.prey-table th{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg);}
+.prey-table td{font-size:12px;padding:8px 10px;border-bottom:1px solid var(--border2);color:var(--bone-dark);}
+.prey-table tr:last-child td{border-bottom:none;}
+.prey-table tr.cur td{background:var(--stage-bg);color:var(--bone);}
+.prey-table tr.cur td:first-child{border-left:3px solid var(--primary);}
+
+/* ── FREQ BARS ───────────────────────────────────────────── */
+.freq-bar-wrap{display:flex;align-items:center;gap:8px;margin-top:2px;}
+.freq-bar-bg{flex:1;height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.freq-bar-fill{height:100%;background:var(--primary);border-radius:3px;}
+.freq-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--primary);min-width:52px;text-align:right;}
+
+/* ── TEMP ZONES ──────────────────────────────────────────── */
+.temp-block{display:flex;gap:8px;align-items:stretch;margin-top:8px;}
+.temp-zone{flex:1;padding:12px;border-radius:8px;text-align:center;}
+.tz-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.tz-val{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;}
+.tz-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+/* casper temps — light mode pearl */
+.casper-theme .hot{background:#eef4fa;border:1px solid #b8cce0;} .casper-theme .hot .tz-label{color:#2a5a8a;} .casper-theme .hot .tz-val{color:#1a3a6a;}
+.casper-theme .warm{background:#f4f7fa;border:1px solid #c8d8e8;} .casper-theme .warm .tz-label{color:#4a7a9a;} .casper-theme .warm .tz-val{color:#2a5a7a;}
+.casper-theme .cool{background:#f8fafb;border:1px solid #d0dce8;} .casper-theme .cool .tz-label{color:#6a8aaa;} .casper-theme .cool .tz-val{color:#3a6a8a;}
+.casper-theme .night{background:#f0f6fc;border:1px solid #bcccd8;} .casper-theme .night .tz-label{color:#7a9ab8;} .casper-theme .night .tz-val{color:#4a7a9a;}
+/* arlo temps — warm amber dark */
+.arlo-theme .hot{background:#3a2010;border:1px solid #7a5020;} .arlo-theme .hot .tz-label{color:#C8943A;} .arlo-theme .hot .tz-val{color:#E8C878;}
+.arlo-theme .warm{background:#2e1808;border:1px solid #603a18;} .arlo-theme .warm .tz-label{color:#a07040;} .arlo-theme .warm .tz-val{color:#C8A860;}
+.arlo-theme .cool{background:#261408;border:1px solid #503010;} .arlo-theme .cool .tz-label{color:#806040;} .arlo-theme .cool .tz-val{color:#A89060;}
+.arlo-theme .night{background:#1e1008;border:1px solid #402808;} .arlo-theme .night .tz-label{color:#705038;} .arlo-theme .night .tz-val{color:#907050;}
+
+/* ── FORMS ───────────────────────────────────────────────── */
+.log-form{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
+.log-form-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);font-family:'JetBrains Mono',monospace;margin-bottom:12px;}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.form-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:110px;}
+.form-field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.form-field input,.form-field select{background:var(--card);border:1px solid var(--border2);color:var(--bone);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'Lato',sans-serif;outline:none;width:100%;}
+.form-field input:focus,.form-field select:focus{border-color:var(--primary);}
+.form-field select option{background:var(--card);}
+.notes-input{flex:1;background:var(--card);border:1px solid var(--border2);color:var(--bone);border-radius:6px;padding:7px 10px;font-size:13px;font-family:'Lato',sans-serif;outline:none;}
+.notes-input:focus{border-color:var(--primary);}
+.btn{background:var(--primary-dim);color:var(--bone);border:1px solid var(--primary);border-radius:7px;padding:8px 18px;font-size:12px;font-weight:700;font-family:'Lato',sans-serif;letter-spacing:0.06em;cursor:pointer;text-transform:uppercase;transition:background 0.15s;}
+.btn:hover{filter:brightness(1.2);}
+.btn-sm{padding:4px 10px;font-size:11px;cursor:pointer;border-radius:5px;border:1px solid var(--border2);background:var(--bg2);color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.btn-sm:hover{color:var(--bone);border-color:var(--primary);}
+
+/* ── LOG TABLE ───────────────────────────────────────────── */
+.log-table{width:100%;border-collapse:collapse;}
+.log-table th{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.log-table td{font-size:12px;padding:8px 10px;border-bottom:1px solid var(--border2);color:var(--bone-dark);vertical-align:middle;}
+.log-table tr:last-child td{border-bottom:none;}
+.accepted{color:var(--sage);font-weight:700;}
+.refused{color:#E06050;font-weight:700;}
+.empty-state{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+
+/* ── HEALTH ──────────────────────────────────────────────── */
+.health-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+.health-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;}
+.health-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.health-dot.good{background:#6aB890;}.health-dot.warn{background:#D4C040;}.health-dot.bad{background:#E06050;}
+.health-item-text{font-size:12px;color:var(--bone-dark);}
+.health-item-label{font-size:10px;color:var(--muted);}
+
+/* ── SHED RINGS ──────────────────────────────────────────── */
+.shed-ring{display:flex;align-items:center;gap:16px;padding:14px 16px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);margin-bottom:10px;}
+.shed-icon{width:44px;height:44px;border-radius:50%;background:var(--card);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+
+/* ── ENC DIAGRAM ─────────────────────────────────────────── */
+.enc-zone{display:flex;height:80px;border-radius:8px;overflow:hidden;border:1px solid var(--border2);margin-top:10px;}
+.enc-hot{flex:1;background:linear-gradient(to right,#2e1e0c,#3a2010);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;}
+.enc-mid{flex:1;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;}
+.enc-cool{flex:1;background:linear-gradient(to left,#1e1408,#261808);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;}
+.arlo-theme .enc-hot{background:linear-gradient(to right,#3a2010,#503018);}
+.arlo-theme .enc-cool{background:linear-gradient(to left,#1e1008,#281808);}
+.casper-theme .enc-hot{background:linear-gradient(to right,#dde8f4,#e8f0f8);}
+.casper-theme .enc-mid{background:#f4f6f8;}
+.casper-theme .enc-cool{background:linear-gradient(to left,#eef4fa,#f4f8fc);}
+.enc-zone-label{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;font-family:'JetBrains Mono',monospace;color:var(--muted);}
+.enc-zone-temp{font-size:12px;color:var(--bone-dark);}
+.enc-features{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.enc-tag{background:var(--card);border:1px solid var(--border2);color:var(--muted);font-size:11px;padding:3px 10px;border-radius:12px;font-family:'JetBrains Mono',monospace;}
+.weight-chart-wrap{position:relative;width:100%;height:180px;margin-top:12px;}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media(max-width:700px){
+  .grid5{grid-template-columns:repeat(3,1fr);}
+  .age-counter{flex-wrap:wrap;}
+  .age-box.dob{flex:100%;}
+  .health-grid{grid-template-columns:1fr;}
+  .temp-block{flex-wrap:wrap;}
+  .temp-zone{min-width:calc(50% - 4px);}
+  .toggle-wrap{top:10px;right:10px;}
+}
+</style>
+</head>
+<body class="casper-theme">
+
+<!-- ARCHIVED — import source only -->
+<div class="archive-banner" role="status">
+  <strong>Archived prototype</strong> — not the live Casper &amp; Arlo Care app.
+  Use this page only to review old localStorage data and click <strong>Export for app</strong>,
+  then import in Care → Settings → Migrate.
+  <div class="steps">Daily logging belongs in the React app (<code>apps/web</code> · usually http://localhost:5173).</div>
+</div>
+
+<!-- MIGRATE + TOGGLE -->
+<div class="export-mig">
+  <button type="button" onclick="exportLegacyDump()" title="Download JSON for Casper &amp; Arlo Care import">Export for app</button>
+</div>
+<div class="toggle-wrap">
+  <button class="tog-btn active-casper" id="btn-casper" onclick="switchPet('casper')">🐍 Casper</button>
+  <button class="tog-btn" id="btn-arlo" onclick="switchPet('arlo')">🦎 Arlo</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  CASPER DASHBOARD                                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="dash-casper" class="db">
+
+  <div class="db-header">
+    <div class="db-header-top">
+      <div>
+        <div class="snake-name">Casper 🐍</div>
+        <div class="snake-species">Python regius · Ball Python</div>
+        <div class="morph-tag">Blue Eyed Leucistic (BEL)</div>
+        <div class="owner-tag">Owner: <span>Erica Motilla</span></div>
+        <div class="sex-badge">♂ Male</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="status-pill">● Active &amp; Healthy</div>
+        <div class="live-clock" id="c-clock"></div>
+      </div>
+    </div>
+    <div class="age-counter">
+      <div class="age-box dob"><div class="card-title" style="margin-bottom:4px;">Date of birth</div><div class="age-box-val">31 July 2025</div></div>
+      <div class="age-box"><div class="age-box-val" id="c-months">—</div><div class="age-box-label">Months old</div></div>
+      <div class="age-box"><div class="age-box-val" id="c-days">—</div><div class="age-box-label">Extra days</div></div>
+      <div class="age-box"><div class="age-box-val" id="c-total">—</div><div class="age-box-label">Total days</div></div>
+    </div>
+    <div id="c-stage-wrap" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="tabs" id="c-tabs">
+    <button class="tab active" onclick="cTab('overview',this)">Overview</button>
+    <button class="tab" onclick="cTab('feeding',this)">Feeding Log</button>
+    <button class="tab" onclick="cTab('prey',this)">Prey Guide</button>
+    <button class="tab" onclick="cTab('habitat',this)">Habitat</button>
+    <button class="tab" onclick="cTab('health',this)">Health</button>
+    <button class="tab" onclick="cTab('species',this)">Species Info</button>
+  </div>
+
+  <!-- CASPER: OVERVIEW -->
+  <div id="c-panel-overview" class="panel active">
+    <div class="grid5">
+      <div class="card"><div class="card-title">Last Fed</div><div class="card-value" id="c-ov-last-fed">—</div><div class="card-sub" id="c-ov-days-ago">No feeds logged</div></div>
+      <div class="card" id="c-next-card"><div class="card-title">Next Feed Due</div><div class="card-value" id="c-ov-next-fed">—</div><div class="card-sub" id="c-ov-next-sub">Log a feed first</div></div>
+      <div class="card"><div class="card-title">Total Feeds</div><div class="card-value" id="c-ov-total">0</div><div class="card-sub">Recorded</div></div>
+      <div class="card"><div class="card-title">Current Weight</div><div class="card-value" id="c-ov-weight">—</div><div class="card-sub" id="c-ov-weight-sub">Not logged</div></div>
+      <div class="card"><div class="card-title">Last Shed</div><div class="card-value" id="c-ov-last-shed">—</div><div class="card-sub" id="c-ov-shed-sub">No sheds logged</div></div>
+    </div>
+    <div class="section-label">Quick feed log</div>
+    <div class="log-form">
+      <div class="log-form-title">Log a Feed</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date</label><input type="date" id="c-q-date"></div>
+        <div class="form-field"><label>Prey Type</label>
+          <select id="c-q-prey">
+            <option>Pinky mouse</option><option>Fuzzy mouse</option>
+            <option selected>Hopper mouse</option><option>Adult mouse</option>
+            <option>Small rat</option><option>Medium rat</option><option>Large rat</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Accepted?</label>
+          <select id="c-q-accept"><option value="yes">Yes</option><option value="no">Refused</option></select>
+        </div>
+        <div class="form-field" style="max-width:100px;"><label>Weight (g)</label><input type="number" id="c-q-weight" placeholder="e.g. 280"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <input class="notes-input" type="text" id="c-q-notes" placeholder="Notes (optional)">
+        <button class="btn" onclick="cLogFeed()">Log Feed</button>
+      </div>
+    </div>
+    <div class="section-label">Recent feeding history</div>
+    <table class="log-table">
+      <thead><tr><th>Date</th><th>Prey</th><th>Result</th><th>Weight</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="c-feed-tbody"><tr><td colspan="6" class="empty-state">No feeds logged yet.</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- CASPER: FEEDING LOG -->
+  <div id="c-panel-feeding" class="panel">
+    <div class="section-label">Feeding frequency by stage</div>
+    <div class="card" style="margin-bottom:12px;">
+      <div class="info-row"><span class="info-label">Hatchling (0–3 mo)</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:100%"></div></div><span class="freq-label">Every 5–7d</span></div></div></div>
+      <div class="info-row cur-hl"><span class="info-label" style="color:var(--primary);">★ Juvenile (3–12 mo) — Casper's stage</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:75%"></div></div><span class="freq-label">Every 7–10d</span></div></div></div>
+      <div class="info-row"><span class="info-label">Sub-adult (1–3 yr)</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:55%"></div></div><span class="freq-label">Every 10–14d</span></div></div></div>
+      <div class="info-row"><span class="info-label">Adult (3+ yr)</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:35%"></div></div><span class="freq-label">Every 14–21d</span></div></div></div>
+    </div>
+    <div class="section-label">Ball python feeding rules</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Prey method</span><span class="info-val">Frozen/thawed only</span></div>
+      <div class="info-row"><span class="info-label">Prey width rule</span><span class="info-val">Match widest point of Casper's body</span></div>
+      <div class="info-row"><span class="info-label">Hunger strikes</span><span class="info-val" style="color:var(--warn);">Common in BPs — don't panic, try braining</span></div>
+      <div class="info-row"><span class="info-label">Handling after feed</span><span class="info-val">Wait 48–72 hrs minimum</span></div>
+      <div class="info-row"><span class="info-label">If refused</span><span class="info-val">Try again in 7 days; check temps &amp; humidity</span></div>
+      <div class="info-row"><span class="info-label">Thaw method</span><span class="info-val">Warm water bag — no microwave</span></div>
+    </div>
+    <div class="section-label">Weight log</div>
+    <div class="log-form">
+      <div class="log-form-title">Log Weight</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date</label><input type="date" id="c-w-date"></div>
+        <div class="form-field"><label>Weight (g)</label><input type="number" id="c-w-weight" placeholder="e.g. 200"></div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="cLogWeight()">Save</button></div>
+      </div>
+    </div>
+    <div class="weight-chart-wrap"><canvas id="c-weightChart" role="img" aria-label="Casper weight chart">No data yet.</canvas></div>
+  </div>
+
+  <!-- CASPER: PREY GUIDE -->
+  <div id="c-panel-prey" class="panel">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Casper is a <strong style="color:var(--primary);">juvenile (~9 months)</strong>. His recommended prey row is highlighted. All prey frozen/thawed.</p>
+    <table class="prey-table">
+      <thead><tr><th>Life Stage</th><th>Age / Size</th><th>Prey Item</th><th>Prey Weight</th><th>Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Hatchling</td><td>0–3 mo / &lt;75g</td><td>Pinky → Fuzzy mouse</td><td>5–10g</td><td>Every 5–7 days</td></tr>
+        <tr><td>Young juvenile</td><td>3–6 mo / 75–150g</td><td>Fuzzy → Hopper mouse</td><td>10–20g</td><td>Every 7 days</td></tr>
+        <tr class="cur"><td>Juvenile <span style="color:var(--primary);font-family:'JetBrains Mono',monospace;font-size:10px;">★ Casper</span></td><td>6–12 mo / 150–350g</td><td>Hopper → Adult mouse</td><td>20–35g</td><td>Every 7–10 days</td></tr>
+        <tr><td>Sub-adult</td><td>1–2 yr / 350g–800g</td><td>Adult mouse / small rat</td><td>40–80g</td><td>Every 10–14 days</td></tr>
+        <tr><td>Adult</td><td>2–4 yr / 800g–1.5kg</td><td>Small–medium rat</td><td>80–200g</td><td>Every 14–21 days</td></tr>
+        <tr><td>Full adult</td><td>4+ yr / 1.5–2kg</td><td>Medium rat</td><td>150–250g</td><td>Every 21–28 days</td></tr>
+      </tbody>
+    </table>
+    <div class="section-label" style="margin-top:18px;">Hunger strike tips</div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--bone-dark);line-height:1.7;padding:4px 0;">
+        Ball pythons are notorious hunger strikers — especially juveniles and during seasonal changes. If Casper refuses:<br><br>
+        <span style="color:var(--primary);">1.</span> Check temperatures — cool side too cold is the #1 cause<br>
+        <span style="color:var(--primary);">2.</span> Check humidity — below 60% causes stress<br>
+        <span style="color:var(--primary);">3.</span> Try a different prey size or scent (wash hands before handling prey)<br>
+        <span style="color:var(--primary);">4.</span> Try "braining" — pierce the skull to release scent<br>
+        <span style="color:var(--primary);">5.</span> Cover the enclosure during feeding for privacy<br>
+        <span style="color:var(--primary);">6.</span> A healthy adult BP can safely fast for 6+ months — don't panic
+      </div>
+    </div>
+  </div>
+
+  <!-- CASPER: HABITAT -->
+  <div id="c-panel-habitat" class="panel">
+    <div class="section-label">Temperature gradient</div>
+    <div class="temp-block">
+      <div class="temp-zone hot"><div class="tz-label">Basking</div><div class="tz-val">88–92°F</div><div class="tz-sub">31–33°C</div></div>
+      <div class="temp-zone warm"><div class="tz-label">Ambient warm</div><div class="tz-val">80–85°F</div><div class="tz-sub">27–29°C</div></div>
+      <div class="temp-zone cool"><div class="tz-label">Cool end</div><div class="tz-val">76–80°F</div><div class="tz-sub">24–27°C</div></div>
+      <div class="temp-zone night"><div class="tz-label">Night min</div><div class="tz-val">72–75°F</div><div class="tz-sub">22–24°C</div></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Enclosure layout</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;">
+      <div class="enc-zone">
+        <div class="enc-hot"><div class="enc-zone-label">Hot end</div><div class="enc-zone-temp">Belly heat + hide</div></div>
+        <div class="enc-mid"><div class="enc-zone-label">Midzone</div><div class="enc-zone-temp">Water bowl</div></div>
+        <div class="enc-cool"><div class="enc-zone-label">Cool end</div><div class="enc-zone-temp">Cool hide</div></div>
+      </div>
+      <div class="enc-features">
+        <span class="enc-tag">Hot hide</span><span class="enc-tag">Cool hide</span><span class="enc-tag">Large water bowl</span>
+        <span class="enc-tag">Under-tank heat</span><span class="enc-tag">Thermostat (essential)</span><span class="enc-tag">Hygrometer</span>
+      </div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Enclosure sizing</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Hatchling (0–6 mo)</span><span class="info-val">20L tub / 20 gal tank</span></div>
+      <div class="info-row cur-hl"><span class="info-label" style="color:var(--primary);">★ Juvenile (6–18 mo) — Casper now</span><span class="info-val hi">3 × 1.5 × 1.5 ft</span></div>
+      <div class="info-row"><span class="info-label">Sub-adult (1–2 yr)</span><span class="info-val">4 × 2 × 2 ft</span></div>
+      <div class="info-row"><span class="info-label">Adult minimum</span><span class="info-val">4 × 2 × 2 ft</span></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Humidity (critical for BPs)</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Target humidity</span><span class="info-val hi">60–80%</span></div>
+      <div class="info-row"><span class="info-label">During shed</span><span class="info-val hi">80–90%</span></div>
+      <div class="info-row"><span class="info-label">Best substrates for humidity</span><span class="info-val">Coco coir, cypress mulch, bio-active</span></div>
+      <div class="info-row"><span class="info-label">Lighting</span><span class="info-val">No UVB required — low-level ambient fine</span></div>
+      <div class="info-row"><span class="info-label">Photoperiod</span><span class="info-val">12 hrs on / 12 hrs off</span></div>
+    </div>
+  </div>
+
+  <!-- CASPER: HEALTH -->
+  <div id="c-panel-health" class="panel">
+    <div class="section-label">Log a shed</div>
+    <div class="log-form">
+      <div class="log-form-title">Shed Log</div>
+      <div class="form-row">
+        <div class="form-field"><label>Shed Date</label><input type="date" id="c-shed-date"></div>
+        <div class="form-field"><label>Quality</label>
+          <select id="c-shed-quality"><option>Complete (one piece)</option><option>Partial</option><option>Poor (multiple pieces)</option></select>
+        </div>
+        <div class="form-field"><label>Eyes clear pre-shed?</label>
+          <select id="c-shed-eyes"><option>Yes</option><option>No — retained eye caps</option></select>
+        </div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="cLogShed()">Log Shed</button></div>
+      </div>
+    </div>
+    <div id="c-shed-list"></div>
+    <div class="section-label" style="margin-top:8px;">Health indicators</div>
+    <div class="health-grid">
+      <div class="health-item"><div class="health-dot good"></div><div><div class="health-item-text">Clear, alert eyes</div><div class="health-item-label">Good sign</div></div></div>
+      <div class="health-item"><div class="health-dot good"></div><div><div class="health-item-text">Clean vent, no swelling</div><div class="health-item-label">Check monthly</div></div></div>
+      <div class="health-item"><div class="health-dot good"></div><div><div class="health-item-text">Solid muscle tone</div><div class="health-item-label">Body condition</div></div></div>
+      <div class="health-item"><div class="health-dot warn"></div><div><div class="health-item-text">Wheezing / mucus</div><div class="health-item-label">Respiratory — vet</div></div></div>
+      <div class="health-item"><div class="health-dot warn"></div><div><div class="health-item-text">Retained shed / eye caps</div><div class="health-item-label">Raise humidity, damp hide</div></div></div>
+      <div class="health-item"><div class="health-dot warn"></div><div><div class="health-item-text">Prolonged hunger strike</div><div class="health-item-label">Common — monitor weight</div></div></div>
+      <div class="health-item"><div class="health-dot bad"></div><div><div class="health-item-text">Stargazing / wobbling</div><div class="health-item-label">IBD — vet urgently</div></div></div>
+      <div class="health-item"><div class="health-dot bad"></div><div><div class="health-item-text">Mites — tiny black dots</div><div class="health-item-label">Treat enclosure + snake</div></div></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Vet visits</div>
+    <div class="log-form">
+      <div class="log-form-title">Log Vet Visit</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date</label><input type="date" id="c-vet-date"></div>
+        <div class="form-field"><label>Reason</label><input type="text" id="c-vet-reason" placeholder="e.g. Annual check..."></div>
+        <div class="form-field"><label>Notes</label><input type="text" id="c-vet-notes" placeholder="Vet's comments..."></div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="cLogVet()">Save</button></div>
+      </div>
+    </div>
+    <table class="log-table">
+      <thead><tr><th>Date</th><th>Reason</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="c-vet-tbody"><tr><td colspan="4" class="empty-state">No vet visits logged.</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- CASPER: SPECIES -->
+  <div id="c-panel-species" class="panel">
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="card"><div class="card-title">Scientific name</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--bone);font-style:italic;margin-top:4px;">Python regius</div></div>
+      <div class="card"><div class="card-title">Morph</div><div style="font-size:13px;color:var(--bone-dark);margin-top:4px;">Blue Eyed Leucistic (BEL) — pure white, blue eyes</div></div>
+    </div>
+    <div class="section-label">Key facts</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Origin</span><span class="info-val">West &amp; Central Africa</span></div>
+      <div class="info-row"><span class="info-label">Adult length</span><span class="info-val">3–5 ft / 0.9–1.5 m</span></div>
+      <div class="info-row"><span class="info-label">Adult weight</span><span class="info-val">1.3–2 kg (females heavier)</span></div>
+      <div class="info-row"><span class="info-label">Lifespan (captive)</span><span class="info-val hi">20–30 years</span></div>
+      <div class="info-row"><span class="info-label">Temperament</span><span class="info-val">Docile, shy — classic beginner snake</span></div>
+      <div class="info-row"><span class="info-label">Activity</span><span class="info-val">Nocturnal, terrestrial, loves to burrow/hide</span></div>
+      <div class="info-row"><span class="info-label">BEL morph note</span><span class="info-val">No pattern, solid white, blue/grey eyes</span></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Handling tips for Casper</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Wait before handling</span><span class="info-val">2 weeks post-arrival</span></div>
+      <div class="info-row"><span class="info-label">After feeding</span><span class="info-val">48–72 hrs minimum</span></div>
+      <div class="info-row"><span class="info-label">Session length</span><span class="info-val">15–30 min — don't over-handle juveniles</span></div>
+      <div class="info-row"><span class="info-label">Approach</span><span class="info-val">From the side — hook or tap first</span></div>
+      <div class="info-row"><span class="info-label">BEL sensitivity</span><span class="info-val">BELs may be more light-sensitive — avoid bright light</span></div>
+    </div>
+  </div>
+</div><!-- end dash-casper -->
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  ARLO DASHBOARD                                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="dash-arlo" class="db" style="display:none;margin-top:0;">
+
+  <div class="db-header">
+    <div class="db-header-top">
+      <div>
+        <div class="snake-name">Arlo 🦎</div>
+        <div class="snake-species">Correlophus ciliatus · Crested Gecko</div>
+        <div class="morph-tag">Lily White</div>
+        <div class="owner-tag">Owner: <span>Erica Motilla</span></div>
+        <div class="sex-badge">♂ Male</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="status-pill">● Active &amp; Healthy</div>
+        <div class="live-clock" id="a-clock"></div>
+      </div>
+    </div>
+    <div class="age-counter">
+      <div class="age-box dob"><div class="card-title" style="margin-bottom:4px;">Date of birth</div><div class="age-box-val">10 September 2025</div></div>
+      <div class="age-box"><div class="age-box-val" id="a-months">—</div><div class="age-box-label">Months old</div></div>
+      <div class="age-box"><div class="age-box-val" id="a-days">—</div><div class="age-box-label">Extra days</div></div>
+      <div class="age-box"><div class="age-box-val" id="a-total">—</div><div class="age-box-label">Total days</div></div>
+    </div>
+    <div id="a-stage-wrap" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="tabs" id="a-tabs">
+    <button class="tab active" onclick="aTab('overview',this)">Overview</button>
+    <button class="tab" onclick="aTab('feeding',this)">Feeding Log</button>
+    <button class="tab" onclick="aTab('diet',this)">Diet Guide</button>
+    <button class="tab" onclick="aTab('habitat',this)">Habitat</button>
+    <button class="tab" onclick="aTab('health',this)">Health</button>
+    <button class="tab" onclick="aTab('species',this)">Species Info</button>
+  </div>
+
+  <!-- ARLO: OVERVIEW -->
+  <div id="a-panel-overview" class="panel active">
+    <div class="grid5">
+      <div class="card"><div class="card-title">Last Fed</div><div class="card-value" id="a-ov-last-fed">—</div><div class="card-sub" id="a-ov-days-ago">No feeds logged</div></div>
+      <div class="card" id="a-next-card"><div class="card-title">Next Feed Due</div><div class="card-value" id="a-ov-next-fed">—</div><div class="card-sub" id="a-ov-next-sub">Log a feed first</div></div>
+      <div class="card"><div class="card-title">Total Feeds</div><div class="card-value" id="a-ov-total">0</div><div class="card-sub">Recorded</div></div>
+      <div class="card"><div class="card-title">Current Weight</div><div class="card-value" id="a-ov-weight">—</div><div class="card-sub" id="a-ov-weight-sub">Not logged</div></div>
+      <div class="card"><div class="card-title">Tail Status</div><div class="card-value" id="a-ov-tail">Intact</div><div class="card-sub" id="a-ov-tail-sub">No drop logged</div></div>
+    </div>
+    <div class="section-label">Quick feed log</div>
+    <div class="log-form">
+      <div class="log-form-title">Log a Feed</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date</label><input type="date" id="a-q-date"></div>
+        <div class="form-field"><label>Food Type</label>
+          <select id="a-q-prey">
+            <option selected>CGD (Repashy/Pangea)</option>
+            <option>Small crickets</option><option>Dubia roaches (small)</option>
+            <option>Waxworms (treat)</option><option>Fruit puree (treat)</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Eaten?</label>
+          <select id="a-q-accept"><option value="yes">Yes</option><option value="no">Untouched</option></select>
+        </div>
+        <div class="form-field" style="max-width:100px;"><label>Weight (g)</label><input type="number" id="a-q-weight" placeholder="e.g. 8"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <input class="notes-input" type="text" id="a-q-notes" placeholder="Notes (optional)">
+        <button class="btn" onclick="aLogFeed()">Log Feed</button>
+      </div>
+    </div>
+    <div class="section-label">Recent feeding history</div>
+    <table class="log-table">
+      <thead><tr><th>Date</th><th>Food</th><th>Result</th><th>Weight</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="a-feed-tbody"><tr><td colspan="6" class="empty-state">No feeds logged yet.</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- ARLO: FEEDING LOG -->
+  <div id="a-panel-feeding" class="panel">
+    <div class="section-label">Feeding schedule</div>
+    <div class="card" style="margin-bottom:12px;">
+      <div class="info-row"><span class="info-label">CGD (main diet)</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:100%"></div></div><span class="freq-label">Every 2–3d</span></div></div></div>
+      <div class="info-row cur-hl"><span class="info-label" style="color:var(--primary);">★ Juvenile routine — Arlo's stage</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:85%"></div></div><span class="freq-label">Every 2d</span></div></div></div>
+      <div class="info-row"><span class="info-label">Live insects (optional)</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:40%"></div></div><span class="freq-label">1–2× / week</span></div></div></div>
+      <div class="info-row"><span class="info-label">Treat foods (fruit, waxworms)</span><div><div class="freq-bar-wrap"><div class="freq-bar-bg"><div class="freq-bar-fill" style="width:15%"></div></div><span class="freq-label">1× / month</span></div></div></div>
+    </div>
+    <div class="section-label">CGD feeding rules</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">CGD brands</span><span class="info-val">Repashy or Pangea (both excellent)</span></div>
+      <div class="info-row"><span class="info-label">Mix ratio</span><span class="info-val">1 part powder : 2 parts water (lick-able consistency)</span></div>
+      <div class="info-row"><span class="info-label">Dish placement</span><span class="info-val">Mid–upper enclosure (arboreal feeder)</span></div>
+      <div class="info-row"><span class="info-label">Refresh CGD</span><span class="info-val">Every 24–36 hrs — remove uneaten</span></div>
+      <div class="info-row"><span class="info-label">Insects</span><span class="info-val">Size = no wider than Arlo's head; dust with calcium</span></div>
+      <div class="info-row"><span class="info-label">Calcium dusting</span><span class="info-val">Calcium w/o D3 twice weekly; with D3 twice monthly</span></div>
+    </div>
+    <div class="section-label">Weight log</div>
+    <div class="log-form">
+      <div class="log-form-title">Log Weight</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date</label><input type="date" id="a-w-date"></div>
+        <div class="form-field"><label>Weight (g)</label><input type="number" id="a-w-weight" placeholder="e.g. 8"></div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="aLogWeight()">Save</button></div>
+      </div>
+    </div>
+    <div class="weight-chart-wrap"><canvas id="a-weightChart" role="img" aria-label="Arlo weight chart">No data yet.</canvas></div>
+  </div>
+
+  <!-- ARLO: DIET GUIDE -->
+  <div id="a-panel-diet" class="panel">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Crested geckos eat very differently from snakes — CGD is their staple, not live prey.</p>
+    <div class="section-label">Diet breakdown</div>
+    <table class="prey-table">
+      <thead><tr><th>Food</th><th>Type</th><th>Frequency</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr class="cur"><td>CGD powder <span style="color:var(--primary);font-family:'JetBrains Mono',monospace;font-size:10px;">★ Main</span></td><td>Meal replacement</td><td>Every 2–3 days</td><td>Repashy or Pangea</td></tr>
+        <tr><td>Small crickets</td><td>Live insects</td><td>1–2× per week</td><td>Dust with calcium</td></tr>
+        <tr><td>Dubia roaches (small)</td><td>Live insects</td><td>1–2× per week</td><td>Good protein source</td></tr>
+        <tr><td>Waxworms</td><td>Treat</td><td>Max 1× per month</td><td>High fat — sparingly</td></tr>
+        <tr><td>Fruit puree</td><td>Treat</td><td>Occasional</td><td>Mashed banana/mango — no citrus</td></tr>
+        <tr><td>Mealworms</td><td>Avoid</td><td>—</td><td>Hard chitin — hard to digest for juveniles</td></tr>
+      </tbody>
+    </table>
+    <div class="section-label" style="margin-top:18px;">Lily White morph diet note</div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--bone-dark);line-height:1.7;padding:4px 0;">
+        The <strong style="color:var(--primary);">Lily White</strong> morph is a co-dominant gene that produces the distinctive white/cream dorsal coloration. There are no special dietary requirements for this morph — care is identical to standard crested geckos. The brownish areas Erica sees are the base coat typical of Lily Whites, which varies in expression.
+      </div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Foods to avoid</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Citrus fruits</span><span class="info-val" style="color:var(--danger);">Toxic — never offer</span></div>
+      <div class="info-row"><span class="info-label">Fireflies / lightning bugs</span><span class="info-val" style="color:var(--danger);">Toxic — never offer</span></div>
+      <div class="info-row"><span class="info-label">Wild-caught insects</span><span class="info-val" style="color:var(--warn);">Risk of parasites &amp; pesticides</span></div>
+      <div class="info-row"><span class="info-label">Avocado</span><span class="info-val" style="color:var(--danger);">Toxic — never offer</span></div>
+      <div class="info-row"><span class="info-label">Spinach / oxalate-rich greens</span><span class="info-val" style="color:var(--warn);">Blocks calcium absorption</span></div>
+    </div>
+  </div>
+
+  <!-- ARLO: HABITAT -->
+  <div id="a-panel-habitat" class="panel">
+    <div class="section-label">Temperature range (no basking needed)</div>
+    <div class="temp-block">
+      <div class="temp-zone hot"><div class="tz-label">Ambient day</div><div class="tz-val">72–78°F</div><div class="tz-sub">22–26°C</div></div>
+      <div class="temp-zone warm"><div class="tz-label">Ideal range</div><div class="tz-val">74–76°F</div><div class="tz-sub">23–24°C</div></div>
+      <div class="temp-zone cool"><div class="tz-label">Night drop</div><div class="tz-val">65–72°F</div><div class="tz-sub">18–22°C</div></div>
+      <div class="temp-zone night"><div class="tz-label">Max safe</div><div class="tz-val">80°F</div><div class="tz-sub">26.5°C — stress above this</div></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Enclosure layout (arboreal — height matters)</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;">
+      <div class="enc-zone">
+        <div class="enc-hot"><div class="enc-zone-label">Top zone</div><div class="enc-zone-temp">Branches + food dish</div></div>
+        <div class="enc-mid"><div class="enc-zone-label">Mid zone</div><div class="enc-zone-temp">Leaves + hides</div></div>
+        <div class="enc-cool"><div class="enc-zone-label">Bottom</div><div class="enc-zone-temp">Substrate + water</div></div>
+      </div>
+      <div class="enc-features">
+        <span class="enc-tag">Vertical space (priority)</span><span class="enc-tag">Cork bark tubes</span>
+        <span class="enc-tag">Fake/live plants</span><span class="enc-tag">Branches + vines</span>
+        <span class="enc-tag">CGD dish (upper)</span><span class="enc-tag">Water dish (lower)</span>
+      </div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Enclosure sizing</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Hatchling (0–3 mo)</span><span class="info-val">Small deli cup / 6×6×12"</span></div>
+      <div class="info-row cur-hl"><span class="info-label" style="color:var(--primary);">★ Juvenile (3–12 mo) — Arlo now</span><span class="info-val hi">12 × 12 × 18" (Exo Terra)</span></div>
+      <div class="info-row"><span class="info-label">Sub-adult / Adult</span><span class="info-val">18 × 18 × 24" or larger</span></div>
+      <div class="info-row"><span class="info-label">Orientation</span><span class="info-val hi">Tall over wide — always</span></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Humidity &amp; misting</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Target humidity</span><span class="info-val hi">60–80%</span></div>
+      <div class="info-row"><span class="info-label">Misting schedule</span><span class="info-val">Twice daily — morning &amp; evening</span></div>
+      <div class="info-row"><span class="info-label">Dry out between mists</span><span class="info-val hi">Yes — must dry fully (prevents rot/RI)</span></div>
+      <div class="info-row"><span class="info-label">UVB</span><span class="info-val">Low-level UVB beneficial (2.0 or 5.0)</span></div>
+      <div class="info-row"><span class="info-label">Substrate</span><span class="info-val">Coco fibre, bio-active mix</span></div>
+    </div>
+  </div>
+
+  <!-- ARLO: HEALTH -->
+  <div id="a-panel-health" class="panel">
+    <div class="section-label">Log a shed</div>
+    <div class="log-form">
+      <div class="log-form-title">Shed Log</div>
+      <div class="form-row">
+        <div class="form-field"><label>Shed Date</label><input type="date" id="a-shed-date"></div>
+        <div class="form-field"><label>Quality</label>
+          <select id="a-shed-quality"><option>Complete</option><option>Partial (stuck shed)</option></select>
+        </div>
+        <div class="form-field"><label>Toes clear?</label>
+          <select id="a-shed-toes"><option>Yes</option><option>No — stuck shed on toes</option></select>
+        </div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="aLogShed()">Log Shed</button></div>
+      </div>
+    </div>
+    <div id="a-shed-list"></div>
+    <div class="section-label" style="margin-top:8px;">Tail drop tracker</div>
+    <div class="log-form">
+      <div class="log-form-title">Log Tail Drop</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Crested geckos cannot regrow their tails. Once dropped, they become "frogbutt" geckos — totally healthy and normal.</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date of drop</label><input type="date" id="a-tail-date"></div>
+        <div class="form-field"><label>Cause (if known)</label><input type="text" id="a-tail-cause" placeholder="e.g. Stress, handling..."></div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="aLogTail()">Log Drop</button></div>
+      </div>
+    </div>
+    <div id="a-tail-status" style="margin-bottom:16px;"></div>
+    <div class="section-label">Health indicators</div>
+    <div class="health-grid">
+      <div class="health-item"><div class="health-dot good"></div><div><div class="health-item-text">Alert, active at night</div><div class="health-item-label">Normal behaviour</div></div></div>
+      <div class="health-item"><div class="health-dot good"></div><div><div class="health-item-text">CGD consumed regularly</div><div class="health-item-label">Appetite — good sign</div></div></div>
+      <div class="health-item"><div class="health-dot good"></div><div><div class="health-item-text">Full sticky toe pads</div><div class="health-item-label">Check after each shed</div></div></div>
+      <div class="health-item"><div class="health-dot warn"></div><div><div class="health-item-text">Stuck shed on toes / eyes</div><div class="health-item-label">Warm damp cotton bud assist</div></div></div>
+      <div class="health-item"><div class="health-dot warn"></div><div><div class="health-item-text">Watery / discoloured stools</div><div class="health-item-label">Parasites — faecal test</div></div></div>
+      <div class="health-item"><div class="health-dot warn"></div><div><div class="health-item-text">Lethargy, hiding all day</div><div class="health-item-label">Check temps — overheating?</div></div></div>
+      <div class="health-item"><div class="health-dot bad"></div><div><div class="health-item-text">Metabolic bone disease (MBD)</div><div class="health-item-label">Jaw deformity, soft bones — vet</div></div></div>
+      <div class="health-item"><div class="health-dot bad"></div><div><div class="health-item-text">Respiratory infection</div><div class="health-item-label">Wheezing, mucus — vet</div></div></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Vet visits</div>
+    <div class="log-form">
+      <div class="log-form-title">Log Vet Visit</div>
+      <div class="form-row">
+        <div class="form-field"><label>Date</label><input type="date" id="a-vet-date"></div>
+        <div class="form-field"><label>Reason</label><input type="text" id="a-vet-reason" placeholder="e.g. Annual check..."></div>
+        <div class="form-field"><label>Notes</label><input type="text" id="a-vet-notes" placeholder="Vet's comments..."></div>
+        <div class="form-field" style="justify-content:flex-end;padding-top:18px;"><button class="btn" onclick="aLogVet()">Save</button></div>
+      </div>
+    </div>
+    <table class="log-table">
+      <thead><tr><th>Date</th><th>Reason</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="a-vet-tbody"><tr><td colspan="4" class="empty-state">No vet visits logged.</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- ARLO: SPECIES -->
+  <div id="a-panel-species" class="panel">
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="card"><div class="card-title">Scientific name</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--bone);font-style:italic;margin-top:4px;">Correlophus ciliatus</div></div>
+      <div class="card"><div class="card-title">Morph</div><div style="font-size:13px;color:var(--bone-dark);margin-top:4px;">Lily White — co-dominant, white/cream dorsal</div></div>
+    </div>
+    <div class="section-label">Key facts</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Origin</span><span class="info-val">New Caledonia (island, South Pacific)</span></div>
+      <div class="info-row"><span class="info-label">Adult size</span><span class="info-val">6–10 inches (15–25 cm) incl. tail</span></div>
+      <div class="info-row"><span class="info-label">Adult weight</span><span class="info-val">35–65g</span></div>
+      <div class="info-row"><span class="info-label">Lifespan (captive)</span><span class="info-val hi">15–20 years</span></div>
+      <div class="info-row"><span class="info-label">Activity</span><span class="info-val">Nocturnal, arboreal</span></div>
+      <div class="info-row"><span class="info-label">Tail</span><span class="info-val">Prehensile — used for climbing; cannot regrow if dropped</span></div>
+      <div class="info-row"><span class="info-label">Temperament</span><span class="info-val">Generally calm — can be flighty as juveniles</span></div>
+      <div class="info-row"><span class="info-label">Lily White note</span><span class="info-val">White dorsal, browning sides, reduced pattern</span></div>
+    </div>
+    <div class="section-label" style="margin-top:18px;">Handling tips for Arlo</div>
+    <div class="card">
+      <div class="info-row"><span class="info-label">Start handling</span><span class="info-val">After 2–4 weeks, short 5 min sessions</span></div>
+      <div class="info-row"><span class="info-label">Technique</span><span class="info-val">Hand-walking — let him walk between hands</span></div>
+      <div class="info-row"><span class="info-label">Jumping</span><span class="info-val">Normal — always handle low over soft surface</span></div>
+      <div class="info-row"><span class="info-label">Tail autotomy</span><span class="info-val">Avoid grabbing or stressing — tail drops permanently</span></div>
+      <div class="info-row"><span class="info-label">Evening handling</span><span class="info-val">Best time — they're naturally active at dusk</span></div>
+    </div>
+  </div>
+
+</div><!-- end dash-arlo -->
+
+<script>
+// ── DATA STORES ───────────────────────────────────────────
+var store={};
+['c_feeds','c_weights','c_sheds','c_vet','a_feeds','a_weights','a_sheds','a_vet','a_tail'].forEach(function(k){
+  try{store[k]=JSON.parse(localStorage.getItem(k)||'[]');}catch(e){store[k]=[];}
+});
+
+function save(k){try{localStorage.setItem(k,JSON.stringify(store[k]));}catch(e){}}
+
+function archiveWriteNotice(){
+  if(window.__archiveWriteWarned) return;
+  window.__archiveWriteWarned=true;
+  try{
+    console.warn('[archive] This page is retired. Export for app, then log in Casper & Arlo Care.');
+  }catch(e){}
+  var el=document.createElement('div');
+  el.setAttribute('role','alert');
+  el.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:300;max-width:420px;background:#3a2010;color:#F2E8D0;border:1px solid #C8943A;border-radius:10px;padding:12px 14px;font:12px/1.4 Lato,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35)';
+  el.innerHTML='<strong style="color:#E8C878">Archived page</strong> — new logs stay only in this browser. Prefer <em>Export for app</em> and use Casper &amp; Arlo Care going forward. <button type="button" style="margin-left:8px;font:inherit;cursor:pointer;background:#503818;color:#E8C878;border:none;border-radius:6px;padding:4px 8px">OK</button>';
+  el.querySelector('button').onclick=function(){el.remove();};
+  document.body.appendChild(el);
+}
+var _save=save;
+save=function(k){archiveWriteNotice();return _save(k);};
+
+
+/** Download a household dump for Settings → Migrate in the Casper & Arlo Care app. */
+function exportLegacyDump(){
+  var payload={
+    version:1,
+    source:'archive/legacy-dashboard',
+    exported_at:new Date().toISOString(),
+    casper:{feeds:store.c_feeds||[],weights:store.c_weights||[],sheds:store.c_sheds||[],vet:store.c_vet||[]},
+    arlo:{feeds:store.a_feeds||[],weights:store.a_weights||[],sheds:store.a_sheds||[],vet:store.a_vet||[],tails:store.a_tail||[]}
+  };
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='casper-arlo-legacy-export.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── DATES ─────────────────────────────────────────────────
+var CASPER_DOB=new Date('2025-07-31');
+var ARLO_DOB=new Date('2025-09-10');
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function daysSince(d){return d?Math.floor((new Date()-new Date(d))/86400000):null;}
+
+function calcAge(dob,now){
+  var y1=dob.getFullYear(),m1=dob.getMonth(),d1=dob.getDate();
+  var y2=now.getFullYear(),m2=now.getMonth(),d2=now.getDate();
+  var months=(y2-y1)*12+(m2-m1);
+  if(d2<d1)months--;
+  var tmp=new Date(dob);tmp.setMonth(tmp.getMonth()+months);
+  var days=Math.floor((now-tmp)/86400000);
+  return{months:months,days:days,total:Math.floor((now-dob)/86400000)};
+}
+
+function stageLabel(m,type){
+  if(type==='crestie'){
+    if(m<3)return{label:'Hatchling',desc:'0–3 months'};
+    if(m<12)return{label:'Juvenile',desc:'3–12 months'};
+    if(m<24)return{label:'Sub-adult',desc:'1–2 years'};
+    return{label:'Adult',desc:'2+ years'};
+  }
+  if(m<3)return{label:'Hatchling',desc:'0–3 months'};
+  if(m<12)return{label:'Juvenile',desc:'3–12 months'};
+  if(m<36)return{label:'Sub-adult',desc:'1–3 years'};
+  return{label:'Adult',desc:'3+ years'};
+}
+
+// ── TICK ──────────────────────────────────────────────────
+function tick(){
+  var now=new Date();
+  var ca=calcAge(CASPER_DOB,now);
+  var aa=calcAge(ARLO_DOB,now);
+  document.getElementById('c-months').textContent=ca.months;
+  document.getElementById('c-days').textContent=ca.days;
+  document.getElementById('c-total').textContent=ca.total;
+  document.getElementById('a-months').textContent=aa.months;
+  document.getElementById('a-days').textContent=aa.days;
+  document.getElementById('a-total').textContent=aa.total;
+  var cs=stageLabel(ca.months,'bp');
+  var as=stageLabel(aa.months,'crestie');
+  document.getElementById('c-stage-wrap').innerHTML='<div class="age-stage-pill">'+cs.label+' · '+cs.desc+'</div>';
+  document.getElementById('a-stage-wrap').innerHTML='<div class="age-stage-pill">'+as.label+' · '+as.desc+'</div>';
+  var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var hh=String(now.getHours()).padStart(2,'0');
+  var mm=String(now.getMinutes()).padStart(2,'0');
+  var ss=String(now.getSeconds()).padStart(2,'0');
+  var clk=now.getDate()+' '+mo[now.getMonth()]+' '+now.getFullYear()+' · '+hh+':'+mm+':'+ss;
+  document.getElementById('c-clock').textContent=clk;
+  document.getElementById('a-clock').textContent=clk;
+}
+tick();setInterval(tick,1000);
+
+// ── INIT DATES ────────────────────────────────────────────
+['c-q-date','c-w-date','c-shed-date','c-vet-date',
+ 'a-q-date','a-w-date','a-shed-date','a-vet-date','a-tail-date'].forEach(function(id){
+  var el=document.getElementById(id);if(el)el.value=todayStr();
+});
+
+// ── PET SWITCHER ──────────────────────────────────────────
+var currentPet='casper';
+function switchPet(pet){
+  currentPet=pet;
+  var isCasper=pet==='casper';
+  document.getElementById('dash-casper').style.display=isCasper?'block':'none';
+  document.getElementById('dash-arlo').style.display=isCasper?'none':'block';
+  document.body.className=isCasper?'casper-theme':'arlo-theme';
+  document.getElementById('btn-casper').className='tog-btn'+(isCasper?' active-casper':'');
+  document.getElementById('btn-arlo').className='tog-btn'+(isCasper?'':' active-arlo');
+  if(pet==='arlo')renderATailStatus();
+}
+
+// ── TAB HELPERS ───────────────────────────────────────────
+function cTab(id,el){
+  document.querySelectorAll('#dash-casper .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#c-tabs .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('c-panel-'+id).classList.add('active');el.classList.add('active');
+  if(id==='feeding')renderCWeightChart();
+}
+function aTab(id,el){
+  document.querySelectorAll('#dash-arlo .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#a-tabs .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('a-panel-'+id).classList.add('active');el.classList.add('active');
+  if(id==='feeding')renderAWeightChart();
+}
+
+// ── NEXT FEED DUE HELPER ──────────────────────────────────
+function updateNextFeed(lastDate,intervalDays,cardId,valId,subId){
+  var card=document.getElementById(cardId);
+  var nv=document.getElementById(valId);
+  var ns=document.getElementById(subId);
+  var dueDate=new Date(lastDate);dueDate.setDate(dueDate.getDate()+intervalDays);
+  var daysUntil=Math.ceil((dueDate-new Date())/86400000);
+  var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  nv.textContent=dueDate.getDate()+' '+mo[dueDate.getMonth()];
+  if(daysUntil<0){ns.textContent='Overdue by '+Math.abs(daysUntil)+'d';card.style.borderColor='#E06050';nv.style.color='#E06050';}
+  else if(daysUntil===0){ns.textContent='Due today!';card.style.borderColor='#D4C040';nv.style.color='#D4C040';}
+  else if(daysUntil<=2){ns.textContent='In '+daysUntil+' day'+(daysUntil===1?'':'s');card.style.borderColor='#D4C040';nv.style.color='#D4C040';}
+  else{ns.textContent='In '+daysUntil+' days';card.style.borderColor='';nv.style.color='';}
+}
+
+// ══════════════════════════════════════════════════════════
+//  CASPER LOGIC
+// ══════════════════════════════════════════════════════════
+var cWChart=null;
+
+function cLogFeed(){
+  var date=document.getElementById('c-q-date').value;
+  var prey=document.getElementById('c-q-prey').value;
+  var accept=document.getElementById('c-q-accept').value;
+  var weight=document.getElementById('c-q-weight').value;
+  var notes=document.getElementById('c-q-notes').value;
+  if(!date||!prey)return;
+  store.c_feeds.unshift({date:date,prey:prey,accept:accept,weight:weight||'',notes:notes||''});
+  if(weight)store.c_weights.push({date:date,weight:parseInt(weight)});
+  save('c_feeds');save('c_weights');
+  document.getElementById('c-q-notes').value='';document.getElementById('c-q-weight').value='';
+  renderCFeeds();renderCOverview();
+}
+
+function deleteCFeed(i){store.c_feeds.splice(i,1);save('c_feeds');renderCFeeds();renderCOverview();}
+
+function renderCFeeds(){
+  var tbody=document.getElementById('c-feed-tbody');
+  if(!store.c_feeds.length){tbody.innerHTML='<tr><td colspan="6" class="empty-state">No feeds logged yet.</td></tr>';return;}
+  tbody.innerHTML=store.c_feeds.map(function(f,i){
+    return'<tr><td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;">'+f.date+'</td><td>'+f.prey+'</td>'+
+    '<td class="'+(f.accept==='yes'?'accepted':'refused')+'">'+(f.accept==='yes'?'✓ Accepted':'✗ Refused')+'</td>'+
+    '<td>'+(f.weight?f.weight+'g':'—')+'</td><td style="color:var(--muted);font-size:11px;">'+(f.notes||'—')+'</td>'+
+    '<td><button class="btn-sm" onclick="deleteCFeed('+i+')">✕</button></td></tr>';
+  }).join('');
+}
+
+function renderCOverview(){
+  var lf=store.c_feeds[0];
+  if(lf){
+    document.getElementById('c-ov-last-fed').textContent=lf.date;
+    var ds=daysSince(lf.date);
+    document.getElementById('c-ov-days-ago').textContent=ds===0?'Today':ds+' days ago';
+    updateNextFeed(lf.date,8,'c-next-card','c-ov-next-fed','c-ov-next-sub');
+  }
+  document.getElementById('c-ov-total').textContent=store.c_feeds.length;
+  var lw=store.c_weights.length?store.c_weights[store.c_weights.length-1]:null;
+  if(lw){document.getElementById('c-ov-weight').textContent=lw.weight+'g';document.getElementById('c-ov-weight-sub').textContent=lw.date;}
+  var ls=store.c_sheds[0];
+  if(ls){document.getElementById('c-ov-last-shed').textContent=ls.date;document.getElementById('c-ov-shed-sub').textContent=daysSince(ls.date)+' days ago';}
+}
+
+function cLogWeight(){
+  var date=document.getElementById('c-w-date').value;
+  var weight=parseInt(document.getElementById('c-w-weight').value);
+  if(!date||!weight)return;
+  store.c_weights.push({date:date,weight:weight});save('c_weights');
+  document.getElementById('c-w-weight').value='';
+  renderCOverview();renderCWeightChart();
+}
+
+function renderCWeightChart(){
+  var ctx=document.getElementById('c-weightChart');
+  if(!ctx)return;if(cWChart){cWChart.destroy();cWChart=null;}
+  if(!store.c_weights.length)return;
+  var sorted=store.c_weights.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  cWChart=new Chart(ctx,{type:'line',data:{labels:sorted.map(function(w){return w.date;}),
+    datasets:[{label:'Weight (g)',data:sorted.map(function(w){return w.weight;}),
+      borderColor:'#2a5a8a',backgroundColor:'rgba(42,90,138,0.1)',pointBackgroundColor:'#2a5a8a',tension:0.3,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#8a9aaa',font:{size:11}},grid:{color:'rgba(180,200,220,0.4)'}},
+              y:{ticks:{color:'#8a9aaa',font:{size:11}},grid:{color:'rgba(180,200,220,0.4)'}}}}});
+}
+
+function cLogShed(){
+  var date=document.getElementById('c-shed-date').value;
+  var q=document.getElementById('c-shed-quality').value;
+  var eyes=document.getElementById('c-shed-eyes').value;
+  if(!date)return;
+  store.c_sheds.unshift({date:date,quality:q,eyes:eyes});save('c_sheds');
+  renderCSheds();renderCOverview();
+}
+
+function renderCSheds(){
+  var el=document.getElementById('c-shed-list');
+  if(!store.c_sheds.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="section-label">Shed history</div>'+
+    store.c_sheds.map(function(s,i){
+      return'<div class="shed-ring"><div class="shed-icon">🐍</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;color:var(--bone);font-weight:700;">'+s.date+'</div>'+
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px;">'+s.quality+' · Eyes: '+s.eyes+'</div></div>'+
+      '<button class="btn-sm" onclick="deleteCShed('+i+')">✕</button></div>';
+    }).join('');
+}
+
+function deleteCShed(i){store.c_sheds.splice(i,1);save('c_sheds');renderCSheds();renderCOverview();}
+
+function cLogVet(){
+  var date=document.getElementById('c-vet-date').value;
+  var reason=document.getElementById('c-vet-reason').value;
+  var notes=document.getElementById('c-vet-notes').value;
+  if(!date||!reason)return;
+  store.c_vet.unshift({date:date,reason:reason,notes:notes||''});save('c_vet');
+  document.getElementById('c-vet-reason').value='';document.getElementById('c-vet-notes').value='';
+  renderCVet();
+}
+
+function renderCVet(){
+  var tbody=document.getElementById('c-vet-tbody');
+  if(!store.c_vet.length){tbody.innerHTML='<tr><td colspan="4" class="empty-state">No vet visits logged.</td></tr>';return;}
+  tbody.innerHTML=store.c_vet.map(function(v,i){
+    return'<tr><td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;">'+v.date+'</td><td>'+v.reason+'</td>'+
+    '<td style="color:var(--muted);font-size:12px;">'+(v.notes||'—')+'</td>'+
+    '<td><button class="btn-sm" onclick="deleteCVet('+i+')">✕</button></td></tr>';
+  }).join('');
+}
+
+function deleteCVet(i){store.c_vet.splice(i,1);save('c_vet');renderCVet();}
+
+// ══════════════════════════════════════════════════════════
+//  ARLO LOGIC
+// ══════════════════════════════════════════════════════════
+var aWChart=null;
+
+function aLogFeed(){
+  var date=document.getElementById('a-q-date').value;
+  var prey=document.getElementById('a-q-prey').value;
+  var accept=document.getElementById('a-q-accept').value;
+  var weight=document.getElementById('a-q-weight').value;
+  var notes=document.getElementById('a-q-notes').value;
+  if(!date||!prey)return;
+  store.a_feeds.unshift({date:date,prey:prey,accept:accept,weight:weight||'',notes:notes||''});
+  if(weight)store.a_weights.push({date:date,weight:parseFloat(weight)});
+  save('a_feeds');save('a_weights');
+  document.getElementById('a-q-notes').value='';document.getElementById('a-q-weight').value='';
+  renderAFeeds();renderAOverview();
+}
+
+function deleteAFeed(i){store.a_feeds.splice(i,1);save('a_feeds');renderAFeeds();renderAOverview();}
+
+function renderAFeeds(){
+  var tbody=document.getElementById('a-feed-tbody');
+  if(!store.a_feeds.length){tbody.innerHTML='<tr><td colspan="6" class="empty-state">No feeds logged yet.</td></tr>';return;}
+  tbody.innerHTML=store.a_feeds.map(function(f,i){
+    return'<tr><td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;">'+f.date+'</td><td>'+f.prey+'</td>'+
+    '<td class="'+(f.accept==='yes'?'accepted':'refused')+'">'+(f.accept==='yes'?'✓ Eaten':'✗ Untouched')+'</td>'+
+    '<td>'+(f.weight?f.weight+'g':'—')+'</td><td style="color:var(--muted);font-size:11px;">'+(f.notes||'—')+'</td>'+
+    '<td><button class="btn-sm" onclick="deleteAFeed('+i+')">✕</button></td></tr>';
+  }).join('');
+}
+
+function renderAOverview(){
+  var lf=store.a_feeds[0];
+  if(lf){
+    document.getElementById('a-ov-last-fed').textContent=lf.date;
+    var ds=daysSince(lf.date);
+    document.getElementById('a-ov-days-ago').textContent=ds===0?'Today':ds+' days ago';
+    updateNextFeed(lf.date,2,'a-next-card','a-ov-next-fed','a-ov-next-sub');
+  }
+  document.getElementById('a-ov-total').textContent=store.a_feeds.length;
+  var lw=store.a_weights.length?store.a_weights[store.a_weights.length-1]:null;
+  if(lw){document.getElementById('a-ov-weight').textContent=lw.weight+'g';document.getElementById('a-ov-weight-sub').textContent=lw.date;}
+  var ls=store.a_sheds[0];
+  if(ls){document.getElementById('a-ov-last-shed') && (document.getElementById('a-ov-last-shed').textContent=ls.date);}
+  renderATailStatus();
+}
+
+function aLogWeight(){
+  var date=document.getElementById('a-w-date').value;
+  var weight=parseFloat(document.getElementById('a-w-weight').value);
+  if(!date||!weight)return;
+  store.a_weights.push({date:date,weight:weight});save('a_weights');
+  document.getElementById('a-w-weight').value='';
+  renderAOverview();renderAWeightChart();
+}
+
+function renderAWeightChart(){
+  var ctx=document.getElementById('a-weightChart');
+  if(!ctx)return;if(aWChart){aWChart.destroy();aWChart=null;}
+  if(!store.a_weights.length)return;
+  var sorted=store.a_weights.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  aWChart=new Chart(ctx,{type:'line',data:{labels:sorted.map(function(w){return w.date;}),
+    datasets:[{label:'Weight (g)',data:sorted.map(function(w){return w.weight;}),
+      borderColor:'#C8943A',backgroundColor:'rgba(200,148,58,0.15)',pointBackgroundColor:'#C8943A',tension:0.3,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#8a7050',font:{size:11}},grid:{color:'rgba(80,56,24,0.4)'}},
+              y:{ticks:{color:'#8a7050',font:{size:11}},grid:{color:'rgba(80,56,24,0.4)'}}}}});
+}
+
+function aLogShed(){
+  var date=document.getElementById('a-shed-date').value;
+  var q=document.getElementById('a-shed-quality').value;
+  var toes=document.getElementById('a-shed-toes').value;
+  if(!date)return;
+  store.a_sheds.unshift({date:date,quality:q,toes:toes});save('a_sheds');
+  renderASheds();renderAOverview();
+}
+
+function renderASheds(){
+  var el=document.getElementById('a-shed-list');
+  if(!store.a_sheds.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="section-label">Shed history</div>'+
+    store.a_sheds.map(function(s,i){
+      return'<div class="shed-ring"><div class="shed-icon">🦎</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;color:var(--bone);font-weight:700;">'+s.date+'</div>'+
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px;">'+s.quality+' · Toes: '+s.toes+'</div></div>'+
+      '<button class="btn-sm" onclick="deleteAShed('+i+')">✕</button></div>';
+    }).join('');
+}
+
+function deleteAShed(i){store.a_sheds.splice(i,1);save('a_sheds');renderASheds();}
+
+function aLogTail(){
+  var date=document.getElementById('a-tail-date').value;
+  var cause=document.getElementById('a-tail-cause').value;
+  if(!date)return;
+  store.a_tail=[{date:date,cause:cause||'Unknown'}];save('a_tail');
+  document.getElementById('a-tail-cause').value='';
+  renderATailStatus();renderAOverview();
+}
+
+function renderATailStatus(){
+  var el=document.getElementById('a-tail-status');
+  var ovEl=document.getElementById('a-ov-tail');
+  var ovSub=document.getElementById('a-ov-tail-sub');
+  if(!el)return;
+  if(store.a_tail&&store.a_tail.length){
+    var t=store.a_tail[0];
+    el.innerHTML='<div class="shed-ring" style="border-color:#D4A040;">'+
+      '<div class="shed-icon" style="border-color:#D4A040;">🔔</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;color:var(--warn);font-weight:700;">Tail dropped — '+t.date+'</div>'+
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px;">Cause: '+t.cause+' · Arlo is a "frogbutt" gecko now — totally healthy!</div></div>'+
+      '<button class="btn-sm" onclick="clearTail()">✕</button></div>';
+    if(ovEl){ovEl.textContent='Dropped';ovEl.style.color='#D4A040';}
+    if(ovSub)ovSub.textContent=t.date;
+  } else {
+    el.innerHTML='';
+    if(ovEl){ovEl.textContent='Intact';ovEl.style.color='';}
+    if(ovSub)ovSub.textContent='No drop logged';
+  }
+}
+
+function clearTail(){store.a_tail=[];save('a_tail');renderATailStatus();renderAOverview();}
+
+function aLogVet(){
+  var date=document.getElementById('a-vet-date').value;
+  var reason=document.getElementById('a-vet-reason').value;
+  var notes=document.getElementById('a-vet-notes').value;
+  if(!date||!reason)return;
+  store.a_vet.unshift({date:date,reason:reason,notes:notes||''});save('a_vet');
+  document.getElementById('a-vet-reason').value='';document.getElementById('a-vet-notes').value='';
+  renderAVet();
+}
+
+function renderAVet(){
+  var tbody=document.getElementById('a-vet-tbody');
+  if(!store.a_vet.length){tbody.innerHTML='<tr><td colspan="4" class="empty-state">No vet visits logged.</td></tr>';return;}
+  tbody.innerHTML=store.a_vet.map(function(v,i){
+    return'<tr><td style="font-family:\'JetBrains Mono\',monospace;font-size:11px;">'+v.date+'</td><td>'+v.reason+'</td>'+
+    '<td style="color:var(--muted);font-size:12px;">'+(v.notes||'—')+'</td>'+
+    '<td><button class="btn-sm" onclick="deleteAVet('+i+')">✕</button></td></tr>';
+  }).join('');
+}
+
+function deleteAVet(i){store.a_vet.splice(i,1);save('a_vet');renderAVet();}
+
+// ── INIT ──────────────────────────────────────────────────
+renderCFeeds();renderCOverview();renderCSheds();renderCVet();
+renderAFeeds();renderAOverview();renderASheds();renderAVet();renderATailStatus();
+</script>
+</body>
+</html>

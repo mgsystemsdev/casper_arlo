@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Casper &amp; Arlo Care — use the app</title>
+  <style>
+    :root {
+      --bg: #1a1008;
+      --card: #2e1e0c;
+      --border: #503818;
+      --bone: #f2e8d0;
+      --muted: #8a7050;
+      --accent: #e8c878;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--bone);
+      background: linear-gradient(160deg, #1a1008 0%, #231508 55%, #161008 100%);
+    }
+    main {
+      width: min(440px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    p {
+      margin: 0 0 14px;
+      font-family: system-ui, sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    a {
+      color: var(--accent);
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, #503818, #7a5828);
+      color: var(--accent);
+    }
+    .btn.secondary {
+      background: transparent;
+      color: var(--bone);
+    }
+    .note {
+      margin-top: 16px;
+      font-family: system-ui, sans-serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Casper &amp; Arlo Care</h1>
+    <p>
+      The old static dashboard is retired. Use the Care app for daily logging,
+      digests, and both pets.
+    </p>
+    <div class="actions">
+      <a class="btn primary" href="http://localhost:5173/">Open Care app (local)</a>
+      <a class="btn secondary" href="archive/legacy-dashboard.html">Archive — export old localStorage</a>
+    </div>
+    <p class="note">
+      Production: open your deployed web URL. Archive path:
+      <code>archive/legacy-dashboard.html</code>
+    </p>
+  </main>
+</body>
+</html>
