@@ -44,6 +44,11 @@ export function FeedingTab({
 
   const stages = animal.feeding_stages
   const current = animal.stage.label
+  const intervalDays = STAGE_ORDER.map((l) => stages[l]?.feeding_interval.recommended_days).filter(
+    (n): n is number => typeof n === 'number',
+  )
+  const minInterval = intervalDays.length ? Math.min(...intervalDays) : 1
+  const maxInterval = intervalDays.length ? Math.max(...intervalDays) : 1
 
   return (
     <div>
@@ -54,7 +59,11 @@ export function FeedingTab({
           if (!rules) return null
           const iv = rules.feeding_interval
           const cur = label === current
-          const widthPct = Math.round((100 * (22 - iv.recommended_days)) / 16)
+          // Wider bar = more frequent. Scales to this species' stage band (snake or crestie).
+          const widthPct =
+            maxInterval === minInterval
+              ? 70
+              : Math.round((100 * (maxInterval - iv.recommended_days)) / (maxInterval - minInterval))
           return (
             <div
               key={label}

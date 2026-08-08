@@ -250,8 +250,23 @@ def preview_digest(db: Session) -> dict[str, Any]:
     mode = getattr(cfg, "digest_mode", None) or "household"
 
     if mode == "per_pet" and pets:
-        subject, html, text = build_household_digest_content(pets)
-        subject = subject.replace(" care digest", " care digests (per pet)")
+        # Mirror send path: one email body per pet, stacked for PDF preview.
+        html_blocks: list[str] = []
+        text_blocks: list[str] = []
+        names: list[str] = []
+        for overview, recent, pet_cfg in pets:
+            subj, html, text = build_digest_content(overview, pet_cfg, recent)
+            name = overview.get("name") or "Pet"
+            names.append(name)
+            html_blocks.append(
+                f"<p style='color:#C4946A;font-size:12px;font-family:monospace;margin:0 0 8px'>"
+                f"Separate email — {subj}</p>{html}"
+            )
+            text_blocks.append(f"=== {subj} ===\n{text}")
+        title = " & ".join(names) if len(names) <= 2 else " · ".join(names)
+        subject = f"{title} care digests (per pet) — {date.today().isoformat()}"
+        html = "\n<hr style='border:none;border-top:1px solid #4a3020;margin:28px 0'/>\n".join(html_blocks)
+        text = "\n\n".join(text_blocks)
     else:
         subject, html, text = build_household_digest_content(pets)
 

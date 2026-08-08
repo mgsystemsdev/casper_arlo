@@ -8,6 +8,7 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
   const pack = animal.species_pack
   const alt = animal.feeding_recommendation.alternative_prey
   const noun = pack.food_noun
+  const isPrey = noun === 'prey'
 
   return (
     <div>
@@ -19,6 +20,12 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
         </strong>{' '}
         (stay within {animal.feeding_recommendation.feeding_interval.min_days}–
         {animal.feeding_recommendation.feeding_interval.max_days}).
+        {isPrey && (
+          <>
+            {' '}
+            Don&apos;t lengthen the next gap just because a feed was late. All prey frozen/thawed.
+          </>
+        )}
       </p>
 
       {pack.guide_notes?.length > 0 && (
@@ -34,22 +41,25 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
         </>
       )}
 
-      {alt.length > 0 && (
-        <>
-          <SectionLabel>Alternatives</SectionLabel>
-          <Card className="mb-3.5 text-[13px] text-bone-dark leading-relaxed">
-            For {current}: <strong className="text-sand">{alt.join(', ')}</strong> as occasional
-            variety only.
-          </Card>
-        </>
-      )}
+      <SectionLabel>{isPrey ? 'Bird / other prey' : 'Occasional extras'}</SectionLabel>
+      <Card className="mb-3.5 text-[13px] text-bone-dark leading-relaxed">
+        For {current}:{' '}
+        {alt.length > 0 ? (
+          <>
+            <strong className="text-sand">{alt.join(', ')}</strong> as occasional alternative only.
+          </>
+        ) : (
+          <>no alternatives listed for this stage.</>
+        )}{' '}
+        Use sparingly.
+      </Card>
 
-      <SectionLabel>{noun === 'prey' ? 'Prey' : 'Diet'} by life stage</SectionLabel>
+      <SectionLabel>{isPrey ? 'Prey' : 'Diet'} by life stage</SectionLabel>
       <div className="overflow-x-auto rounded-[10px] border border-border">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="bg-charcoal">
-              {['Stage', 'Age', 'Recommended', 'Frequency'].map((h) => (
+              {['Life Stage', 'Age', 'Recommended', 'Acceptable', 'Frequency'].map((h) => (
                 <th
                   key={h}
                   className="border-b border-border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
@@ -64,6 +74,7 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
               const rules = animal.feeding_stages[label]
               if (!rules) return null
               const on = label === current
+              const iv = rules.feeding_interval
               return (
                 <tr
                   key={label}
@@ -71,15 +82,17 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
                   style={on ? { boxShadow: 'inset 3px 0 0 var(--color-sand)' } : undefined}
                 >
                   <td className="border-b border-border px-2.5 py-2 text-[12px]">
-                    {label}
-                    {on && <span className="ml-1 font-mono text-[10px] text-sand">★</span>}
+                    {on ? `★ ${label}` : label}
                   </td>
                   <td className="border-b border-border px-2.5 py-2 text-[12px]">{rules.desc}</td>
                   <td className="border-b border-border px-2.5 py-2 text-[12px]">
                     {rules.recommended.join(', ')}
                   </td>
+                  <td className="border-b border-border px-2.5 py-2 text-[12px]">
+                    {rules.acceptable.join(', ') || '—'}
+                  </td>
                   <td className="border-b border-border px-2.5 py-2 font-mono text-[12px] text-sand">
-                    {rules.feeding_interval.min_days}–{rules.feeding_interval.max_days}d
+                    Every {iv.min_days}–{iv.max_days} days
                   </td>
                 </tr>
               )
@@ -87,9 +100,10 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
           </tbody>
         </table>
       </div>
-      <Card className="mt-3.5 text-[12px] text-muted leading-relaxed">
-        Pick a {noun} from the list when logging. Age sets the stage; stage sets recommended vs
-        acceptable. Grams are optional logging only.
+      <SectionLabel>Category rule</SectionLabel>
+      <Card className="mt-0 text-[13px] text-bone-dark leading-relaxed">
+        Pick a {noun} category from the list. Age sets the stage; stage sets recommended vs acceptable
+        vs too small / too large. Grams are optional logging only — not used for recommendations.
       </Card>
     </div>
   )

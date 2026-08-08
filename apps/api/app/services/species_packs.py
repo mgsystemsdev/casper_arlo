@@ -19,6 +19,7 @@ BP_FOOD: list[str] = [
     "Small rat",
     "Medium rat",
     "Large rat",
+    "Quail chick",
 ]
 
 BP_SIZE_ORDER: dict[str, int] = {
@@ -30,6 +31,7 @@ BP_SIZE_ORDER: dict[str, int] = {
     "Small rat": 65,
     "Medium rat": 80,
     "Large rat": 95,
+    "Quail chick": 70,
 }
 
 BP_STAGES: dict[str, dict[str, Any]] = {
@@ -51,14 +53,14 @@ BP_STAGES: dict[str, dict[str, Any]] = {
         "desc": "1–3 years",
         "recommended": ["Adult mouse", "Rat pup", "Small rat"],
         "acceptable": ["Hopper mouse", "Medium rat"],
-        "alternative": [],
+        "alternative": ["Quail chick"],
         "feeding_interval": {"min_days": 10, "max_days": 14, "recommended_days": 12},
     },
     "Adult": {
         "desc": "3+ years",
         "recommended": ["Small rat", "Medium rat"],
         "acceptable": ["Rat pup", "Large rat"],
-        "alternative": [],
+        "alternative": ["Quail chick"],
         "feeding_interval": {"min_days": 14, "max_days": 21, "recommended_days": 17},
     },
 }
@@ -147,9 +149,12 @@ PACKS: dict[str, dict[str, Any]] = {
             ["Adult length", "1–1.5 m (3–5 ft)"],
             ["Adult weight", "1–2 kg typical"],
             ["Lifespan (captive)", "20–30 years"],
-            ["Activity", "Nocturnal"],
-            ["Feeding", "Constriction — frozen/thawed rodents"],
-            ["Note", "Common hunger strikers — monitor weight"],
+            ["Sexual maturity", "2–3 years typical"],
+            ["Activity pattern", "Nocturnal"],
+            ["Temperament", "Docile; common hunger strikers"],
+            ["Feeding method", "Constriction — frozen/thawed rodents"],
+            ["Conservation status", "Least Concern (IUCN)"],
+            ["Note", "BEL morphs can be light-sensitive"],
         ],
         "handling_tips": [
             ["After feeding", "48–72 hrs minimum"],
@@ -157,9 +162,15 @@ PACKS: dict[str, dict[str, Any]] = {
             ["Approach", "Support body — never dangle"],
             ["BEL note", "Blue-eyed leucistics can be light-sensitive"],
         ],
+        "habitat_notes": [
+            ["Photoperiod", "12 hrs light / 12 hrs dark"],
+            ["Substrate", "Coco coir, cypress mulch, or aspen (dry end)"],
+            ["Hides", "Hot + cool hide minimum; humid hide for shed"],
+        ],
         "guide_notes": [
             "All prey frozen/thawed — never live.",
             "Match prey width to the widest point of the body.",
+            "Don't lengthen the next gap just because a feed was late.",
             "Hunger strikes are common; check temps/humidity first.",
         ],
         "health_indicators": [
@@ -205,9 +216,12 @@ PACKS: dict[str, dict[str, Any]] = {
             ["Habitat", "Arboreal — rainforest canopy"],
             ["Adult length", "15–25 cm (incl. tail)"],
             ["Lifespan (captive)", "15–20 years"],
-            ["Activity", "Nocturnal"],
+            ["Sexual maturity", "~15–18 months"],
+            ["Activity pattern", "Nocturnal / crepuscular"],
+            ["Temperament", "Curious; may jump — handle low"],
             ["Diet", "CGD staple + occasional insects"],
             ["Tail", "Prehensile; does not regrow if dropped"],
+            ["Conservation status", "Vulnerable (wild) — captive bred preferred"],
             ["Note", "No basking lamp — overheating is dangerous"],
         ],
         "handling_tips": [
@@ -215,6 +229,11 @@ PACKS: dict[str, dict[str, Any]] = {
             ["Session length", "5–15 min; watch for stress"],
             ["Approach", "Never grab the tail"],
             ["Tail autotomy", "Dropped tails do not regenerate"],
+        ],
+        "habitat_notes": [
+            ["Photoperiod", "12 hrs light / 12 hrs dark (no UVB required for CGD keepers)"],
+            ["Substrate", "Coco fiber / bioactive mix — holds humidity"],
+            ["Vertical space", "Tall enclosure with branches + hides"],
         ],
         "guide_notes": [
             "CGD (Repashy or Pangea) is the staple — not live prey.",
@@ -266,5 +285,6 @@ def pack_public(pack: dict[str, Any]) -> dict[str, Any]:
         "facts": pack["facts"],
         "handling_tips": pack["handling_tips"],
         "guide_notes": pack["guide_notes"],
+        "habitat_notes": pack.get("habitat_notes") or [],
         "health_indicators": pack["health_indicators"],
     }

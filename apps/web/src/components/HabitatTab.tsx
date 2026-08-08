@@ -188,10 +188,10 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
         </ul>
       )}
 
-      <SectionLabel>Humidity targets</SectionLabel>
+      <SectionLabel>Humidity & lighting targets</SectionLabel>
       <Card>
         {[
-          ['Normal', `${env.rh_normal[0]}–${env.rh_normal[1]}%`],
+          ['Target humidity', `${env.rh_normal[0]}–${env.rh_normal[1]}%`],
           ['During shed', `${env.rh_shed[0]}–${env.rh_shed[1]}%`],
           [
             'Heat note',
@@ -199,6 +199,7 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
               ? 'UTH + thermostat required — never free-run heat'
               : 'No basking bulb — stay under ~80°F ambient',
           ],
+          ...(pack.habitat_notes || []),
         ].map(([k, v]) => (
           <div key={k} className="flex justify-between border-b border-border py-2 text-[13px] last:border-0">
             <span className="text-muted">{k}</span>

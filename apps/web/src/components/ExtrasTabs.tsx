@@ -303,8 +303,9 @@ ${dig.html}
       <SectionLabel>Today’s digest</SectionLabel>
       <LogForm title="Same content as the care email">
         <p className="mb-2 text-[12px] text-muted">
-          Preview covers both pets (household layout). In per-pet mode, Resend sends one email per animal at the
-          same times. Care blocks below are saved for <strong>{petName}</strong> only.
+          Preview matches send mode: household = one combined email; per-pet = each animal&apos;s email stacked
+          (Resend still sends them separately at the same times). Care blocks below are saved for{' '}
+          <strong>{petName}</strong> only.
         </p>
         <Btn onClick={() => void downloadPdfToday()}>Download PDF today</Btn>
         {pdfMsg && <p className="mt-2 font-mono text-[11px] text-sand">{pdfMsg}</p>}

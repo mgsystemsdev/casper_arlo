@@ -100,26 +100,26 @@ def test_adaptive_insufficient_falls_back():
 def test_suggest_prey_prefers_accepted():
     today = date.today()
     feeds = [
-        _feed(today - timedelta(days=10), "Norwegian weaned", True, 1),
-        _feed(today - timedelta(days=20), "Norwegian weaned", True, 2),
-        _feed(today - timedelta(days=30), "Norwegian fuzzy", True, 3),
+        _feed(today - timedelta(days=10), "Adult mouse", True, 1),
+        _feed(today - timedelta(days=20), "Adult mouse", True, 2),
+        _feed(today - timedelta(days=30), "Fuzzy mouse", True, 3),
     ]
-    # Juvenile (~6 mo): Norwegian weaned is recommended
-    out = suggest_prey(age_months=6, feeds=feeds, last_prey="Norwegian fuzzy")
-    assert out["suggested_prey"] == "Norwegian weaned"
-    assert out["prey_accept_counts"].get("Norwegian weaned", 0) >= 2
+    # Juvenile (~6 mo): Adult mouse is recommended
+    out = suggest_prey(age_months=6, feeds=feeds, last_prey="Fuzzy mouse")
+    assert out["suggested_prey"] == "Adult mouse"
+    assert out["prey_accept_counts"].get("Adult mouse", 0) >= 2
 
 
 def test_suggest_prey_demotes_double_refuse():
     today = date.today()
     feeds = [
-        _feed(today - timedelta(days=1), "Norwegian pup", False, 2),
-        _feed(today - timedelta(days=8), "Norwegian pup", False, 1),
-        _feed(today - timedelta(days=20), "Norwegian fuzzy", True, 0),
+        _feed(today - timedelta(days=1), "Hopper mouse", False, 2),
+        _feed(today - timedelta(days=8), "Hopper mouse", False, 1),
+        _feed(today - timedelta(days=20), "Fuzzy mouse", True, 0),
     ]
-    out = suggest_prey(age_months=6, feeds=feeds, last_prey="Norwegian pup")
-    assert "Norwegian pup" in out["demoted_prey"]
-    assert out["suggested_prey"] != "Norwegian pup"
+    out = suggest_prey(age_months=6, feeds=feeds, last_prey="Hopper mouse")
+    assert "Hopper mouse" in out["demoted_prey"]
+    assert out["suggested_prey"] != "Hopper mouse"
 
 
 def test_weight_drop():

@@ -274,6 +274,7 @@ export type SpeciesPack = {
   facts: [string, string][]
   handling_tips: [string, string][]
   guide_notes: string[]
+  habitat_notes: [string, string][]
   health_indicators: [string, string, string][]
 }
 
