@@ -41,7 +41,7 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
         </>
       )}
 
-      <SectionLabel>{isPrey ? 'Bird / other prey' : 'Occasional extras'}</SectionLabel>
+      <SectionLabel>{isPrey ? 'Other prey' : 'Occasional extras'}</SectionLabel>
       <Card className="mb-3.5 text-[13px] text-bone-dark leading-relaxed">
         For {current}:{' '}
         {alt.length > 0 ? (

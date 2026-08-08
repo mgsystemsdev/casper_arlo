@@ -223,7 +223,7 @@ def upgrade() -> None:
             'Ball Python · Blue Eyed Leucistic (BEL)',
             '2025-07-31',
             'male',
-            'Erica Motilla',
+            'Erika Motilla',
             'Active & Healthy'
         ),
         (
@@ -232,7 +232,7 @@ def upgrade() -> None:
             'Crested Gecko · Lily White',
             '2025-09-10',
             'male',
-            'Erica Motilla',
+            'Erika Motilla',
             'Active & Healthy'
         )
         """

@@ -110,8 +110,8 @@ cd apps/api && PYTHONPATH=. .venv/bin/pytest tests/ -q
 
 | Name   | Species              | Morph        | DOB        | Owner         |
 |--------|----------------------|--------------|------------|---------------|
-| Casper | *Python regius*      | BEL          | 2025-07-31 | Erica Motilla |
-| Arlo   | *Correlophus ciliatus*| Lily White  | 2025-09-10 | Erica Motilla |
+| Casper | *Python regius*      | BEL          | 2025-07-31 | Erika Motilla |
+| Arlo   | *Correlophus ciliatus*| Lily White  | 2025-09-10 | Erika Motilla |
 
 Pet switcher + dual themes (Casper light / Arlo amber) are live. Species packs drive feeding intervals, habitat bands, diet vs prey guides, and Arlo’s tail tracker.
 

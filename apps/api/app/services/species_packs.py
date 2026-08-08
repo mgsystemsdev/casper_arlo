@@ -9,58 +9,69 @@ from typing import Any, Literal
 
 SpeciesKey = Literal["ball_python", "crested_gecko"]
 
-# --- Ball python (Casper) ---
+# --- Ball python (Casper) — Allie prey ladder minus birds ---
 BP_FOOD: list[str] = [
     "Pinky mouse",
     "Fuzzy mouse",
-    "Hopper mouse",
     "Adult mouse",
-    "Rat pup",
-    "Small rat",
-    "Medium rat",
-    "Large rat",
-    "Quail chick",
+    "Norwegian pinky",
+    "Norwegian fuzzy",
+    "Norwegian pup",
+    "Norwegian weaned",
+    "Norwegian small",
+    "Norwegian medium",
+    "Norwegian large",
+    "Norwegian jumbo",
+    "Rabbit",
 ]
 
 BP_SIZE_ORDER: dict[str, int] = {
     "Pinky mouse": 10,
+    "Norwegian pinky": 15,
     "Fuzzy mouse": 20,
-    "Hopper mouse": 30,
-    "Adult mouse": 40,
-    "Rat pup": 50,
-    "Small rat": 65,
-    "Medium rat": 80,
-    "Large rat": 95,
-    "Quail chick": 70,
+    "Norwegian fuzzy": 25,
+    "Adult mouse": 30,
+    "Norwegian pup": 35,
+    "Norwegian weaned": 45,
+    "Norwegian small": 55,
+    "Norwegian medium": 65,
+    "Norwegian large": 75,
+    "Norwegian jumbo": 85,
+    "Rabbit": 95,
 }
 
 BP_STAGES: dict[str, dict[str, Any]] = {
     "Hatchling": {
         "desc": "0–3 months",
-        "recommended": ["Pinky mouse", "Fuzzy mouse"],
-        "acceptable": ["Hopper mouse"],
+        "recommended": ["Pinky mouse", "Fuzzy mouse", "Norwegian pinky"],
+        "acceptable": ["Adult mouse", "Norwegian fuzzy"],
         "alternative": [],
         "feeding_interval": {"min_days": 5, "max_days": 7, "recommended_days": 6},
     },
     "Juvenile": {
         "desc": "3–12 months",
-        "recommended": ["Fuzzy mouse", "Hopper mouse", "Adult mouse"],
-        "acceptable": ["Pinky mouse", "Rat pup"],
+        "recommended": [
+            "Adult mouse",
+            "Norwegian fuzzy",
+            "Norwegian pup",
+            "Norwegian weaned",
+        ],
+        "acceptable": ["Fuzzy mouse", "Norwegian pinky", "Norwegian small"],
         "alternative": [],
         "feeding_interval": {"min_days": 7, "max_days": 10, "recommended_days": 8},
     },
     "Sub-adult": {
         "desc": "1–3 years",
-        "recommended": ["Adult mouse", "Rat pup", "Small rat"],
-        "acceptable": ["Hopper mouse", "Medium rat"],
-        "alternative": ["Quail chick"],
+        "recommended": ["Norwegian weaned", "Norwegian small", "Norwegian medium"],
+        "acceptable": ["Adult mouse", "Norwegian pup", "Norwegian large"],
+        "alternative": [],
         "feeding_interval": {"min_days": 10, "max_days": 14, "recommended_days": 12},
     },
     "Adult": {
         "desc": "3+ years",
-        "recommended": ["Small rat", "Medium rat"],
-        "acceptable": ["Rat pup", "Large rat"],
-        "alternative": ["Quail chick"],
+        "recommended": ["Norwegian small", "Norwegian medium", "Norwegian large"],
+        "acceptable": ["Norwegian weaned", "Norwegian jumbo"],
+        "alternative": ["Rabbit"],
         "feeding_interval": {"min_days": 14, "max_days": 21, "recommended_days": 17},
     },
 }

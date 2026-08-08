@@ -113,13 +113,13 @@ def test_suggest_prey_prefers_accepted():
 def test_suggest_prey_demotes_double_refuse():
     today = date.today()
     feeds = [
-        _feed(today - timedelta(days=1), "Hopper mouse", False, 2),
-        _feed(today - timedelta(days=8), "Hopper mouse", False, 1),
+        _feed(today - timedelta(days=1), "Norwegian fuzzy", False, 2),
+        _feed(today - timedelta(days=8), "Norwegian fuzzy", False, 1),
         _feed(today - timedelta(days=20), "Fuzzy mouse", True, 0),
     ]
-    out = suggest_prey(age_months=6, feeds=feeds, last_prey="Hopper mouse")
-    assert "Hopper mouse" in out["demoted_prey"]
-    assert out["suggested_prey"] != "Hopper mouse"
+    out = suggest_prey(age_months=6, feeds=feeds, last_prey="Norwegian fuzzy")
+    assert "Norwegian fuzzy" in out["demoted_prey"]
+    assert out["suggested_prey"] != "Norwegian fuzzy"
 
 
 def test_weight_drop():

@@ -50,10 +50,10 @@ def test_recommended_items_per_stage():
 
 
 def test_acceptable_and_alternative():
-    juv = recommend_feeding(6, "Rat pup")
+    juv = recommend_feeding(6, "Norwegian small")
     assert juv["prey_status"] == "acceptable"
-    # Ball python pack keeps bird/other as Adult alternative
-    adult_alt = recommend_feeding(40, "Quail chick")
+    # No birds — Rabbit is the only Adult alternative
+    adult_alt = recommend_feeding(40, "Rabbit")
     assert adult_alt["prey_status"] == "alternative"
     # Crestie insects
     cg = recommend_feeding(6, "Crickets", pack_key="crested_gecko")
@@ -63,12 +63,11 @@ def test_acceptable_and_alternative():
 
 
 def test_too_small_and_too_large():
-    # Juvenile BP: Pinky is acceptable; Hopper/Fuzzy/Adult mouse in band; Large rat too big
-    assert recommend_feeding(6, "Large rat")["prey_status"] == "too_large"
-    assert recommend_feeding(1, "Medium rat")["prey_status"] == "too_large"
+    # Juvenile BP: Norwegian jumbo / Rabbit above band; Pinky too small for Adult
+    assert recommend_feeding(6, "Norwegian jumbo")["prey_status"] == "too_large"
+    assert recommend_feeding(1, "Norwegian medium")["prey_status"] == "too_large"
     assert recommend_feeding(40, "Pinky mouse")["prey_status"] == "too_small"
-    # Hatchling: Small rat far above band
-    assert recommend_feeding(1, "Small rat")["prey_status"] == "too_large"
+    assert recommend_feeding(1, "Norwegian small")["prey_status"] == "too_large"
 
 
 def test_unknown_prey():
@@ -86,11 +85,11 @@ def test_null_selected_prey():
 
 
 def test_stage_transition_same_prey():
-    """Hopper mouse: recommended at 11 mo, acceptable at 12 mo (sub-adult)."""
-    assert recommend_feeding(11, "Hopper mouse")["stage"] == "Juvenile"
-    assert recommend_feeding(11, "Hopper mouse")["prey_status"] == "recommended"
-    assert recommend_feeding(12, "Hopper mouse")["stage"] == "Sub-adult"
-    assert recommend_feeding(12, "Hopper mouse")["prey_status"] == "acceptable"
+    """Adult mouse: recommended at 11 mo, acceptable at 12 mo (sub-adult)."""
+    assert recommend_feeding(11, "Adult mouse")["stage"] == "Juvenile"
+    assert recommend_feeding(11, "Adult mouse")["prey_status"] == "recommended"
+    assert recommend_feeding(12, "Adult mouse")["stage"] == "Sub-adult"
+    assert recommend_feeding(12, "Adult mouse")["prey_status"] == "acceptable"
 
 
 def test_interval_shape():
@@ -103,16 +102,17 @@ def test_prey_status_by_category_covers_prey():
     out = recommend_feeding(6, None)
     assert set(out["prey_status_by_category"].keys()) == set(PREY)
     assert out["prey_status_by_category"]["Adult mouse"] == "recommended"
-    # Pinky is acceptable for juvenile BP (not too_small)
-    assert out["prey_status_by_category"]["Pinky mouse"] == "acceptable"
-    assert out["prey_status_by_category"]["Large rat"] == "too_large"
+    assert out["prey_status_by_category"]["Fuzzy mouse"] == "acceptable"
+    assert out["prey_status_by_category"]["Norwegian jumbo"] == "too_large"
+    assert "Day-old chick" not in out["prey_status_by_category"]
+    assert "Quail" not in out["prey_status_by_category"]
 
 
 def test_return_lists_present():
-    out = recommend_feeding(18, "Adult mouse")
+    out = recommend_feeding(18, "Norwegian weaned")
     assert "acceptable_prey" in out
     assert "alternative_prey" in out
-    assert "Adult mouse" in out["recommended_prey"]
+    assert "Norwegian weaned" in out["recommended_prey"]
 
 
 def test_crestie_cgd_recommended():
