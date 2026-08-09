@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
 import { api, todayStr, type AnimalOverview, type EnvReading, type Maint } from '../api/client'
-import { Btn, BtnSm, Card, Empty, Field, Input, LogForm, SectionLabel, Select } from './ui'
-
-const ZONE_STYLES = [
-  'bg-[#5a2010] border-[#8a4020] text-[#F4A070]',
-  'bg-[#3a2a10] border-[#6a4a20] text-[#E8C080]',
-  'bg-[#1a2a3a] border-[#2a4a6a] text-[#90C0E8]',
-  'bg-[#1a1a2a] border-[#2a2a5a] text-[#AAAADD]',
-]
+import {
+  Btn,
+  BtnSm,
+  DataTable,
+  Empty,
+  FactList,
+  Field,
+  Input,
+  ListRow,
+  LogForm,
+  SectionLabel,
+  Select,
+  Td,
+  Th,
+} from './ui'
 
 export function HabitatTab({ animal }: { animal: AnimalOverview }) {
   const pack = animal.species_pack
@@ -40,17 +47,12 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
   return (
     <div>
       <SectionLabel>Temperature targets</SectionLabel>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {pack.habitat_zones.map((z, i) => (
-          <div
-            key={z.label}
-            className={`min-w-[120px] flex-1 rounded-lg border p-3 text-center ${ZONE_STYLES[i % ZONE_STYLES.length]}`}
-          >
-            <div className="mb-1 font-mono text-[9px] font-bold uppercase tracking-[0.1em] opacity-80">
-              {z.label}
-            </div>
-            <div className="font-display text-lg font-semibold">{z.f}</div>
-            <div className="mt-0.5 text-[10px] text-muted">{z.c}</div>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
+        {pack.habitat_zones.map((z) => (
+          <div key={z.label}>
+            <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">{z.label}</div>
+            <div className="mt-0.5 font-display text-xl font-semibold text-sand">{z.f}</div>
+            <div className="mt-0.5 text-[11px] text-muted">{z.c}</div>
           </div>
         ))}
       </div>
@@ -95,28 +97,26 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
       {readings.length === 0 ? (
         <Empty>No environment readings yet.</Empty>
       ) : (
-        <table className="mb-4 w-full border-collapse text-[12px]">
+        <DataTable className="mb-2">
           <thead>
-            <tr className="border-b border-border text-left font-mono text-[10px] uppercase text-muted">
-              <th className="px-2 py-1.5">When</th>
-              <th className="px-2 py-1.5">Hot</th>
-              <th className="px-2 py-1.5">Cool</th>
-              <th className="px-2 py-1.5">Night</th>
-              <th className="px-2 py-1.5">RH%</th>
-              <th />
+            <tr className="border-b border-border">
+              <Th>When</Th>
+              <Th>Hot</Th>
+              <Th>Cool</Th>
+              <Th>Night</Th>
+              <Th>RH%</Th>
+              <Th />
             </tr>
           </thead>
           <tbody>
             {readings.map((r) => (
-              <tr key={r.id} className="border-b border-border text-bone-dark">
-                <td className="px-2 py-2 font-mono text-[11px]">
-                  {r.recorded_at.slice(0, 16).replace('T', ' ')}
-                </td>
-                <td className="px-2 py-2">{r.temp_hot_f}°</td>
-                <td className="px-2 py-2">{r.temp_cool_f}°</td>
-                <td className="px-2 py-2">{r.temp_night_f ?? '—'}°</td>
-                <td className="px-2 py-2">{r.humidity_pct}%</td>
-                <td className="px-2 py-2">
+              <tr key={r.id} className="border-b border-border/70">
+                <Td mono>{r.recorded_at.slice(0, 16).replace('T', ' ')}</Td>
+                <Td>{r.temp_hot_f}°</Td>
+                <Td>{r.temp_cool_f}°</Td>
+                <Td>{r.temp_night_f ?? '—'}°</Td>
+                <Td>{r.humidity_pct}%</Td>
+                <Td>
                   <BtnSm
                     onClick={async () => {
                       await api.envReadings.remove(r.id)
@@ -125,11 +125,11 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
                   >
                     ✕
                   </BtnSm>
-                </td>
+                </Td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </DataTable>
       )}
 
       <SectionLabel>Enclosure maintenance — {animal.name}</SectionLabel>
@@ -164,33 +164,34 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
       {maint.length === 0 ? (
         <Empty>No maintenance logged.</Empty>
       ) : (
-        <ul className="space-y-2">
+        <ul>
           {maint.map((m) => (
-            <li
+            <ListRow
               key={m.id}
-              className="flex justify-between rounded-lg border border-border-hi bg-bark px-3 py-2 text-[13px]"
-            >
-              <span>
-                <span className="font-mono text-sand">{m.date}</span> ·{' '}
-                {m.kind === 'substrate' ? 'Sub / mist' : m.kind === 'deep_clean' ? 'Deep clean' : m.kind}
-                {m.notes ? ` — ${m.notes}` : ''}
-              </span>
-              <BtnSm
-                onClick={async () => {
-                  await api.maintenance.remove(m.id)
-                  await load()
-                }}
-              >
-                ✕
-              </BtnSm>
-            </li>
+              primary={
+                <>
+                  <span className="font-mono text-[11px] text-sand">{m.date}</span>
+                  {' · '}
+                  {m.kind === 'substrate'
+                    ? 'Sub / mist'
+                    : m.kind === 'deep_clean'
+                      ? 'Deep clean'
+                      : m.kind}
+                </>
+              }
+              secondary={m.notes || undefined}
+              onRemove={async () => {
+                await api.maintenance.remove(m.id)
+                await load()
+              }}
+            />
           ))}
         </ul>
       )}
 
       <SectionLabel>Humidity & lighting targets</SectionLabel>
-      <Card>
-        {[
+      <FactList
+        rows={[
           ['Target humidity', `${env.rh_normal[0]}–${env.rh_normal[1]}%`],
           ['During shed', `${env.rh_shed[0]}–${env.rh_shed[1]}%`],
           [
@@ -200,13 +201,8 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
               : 'No basking bulb — stay under ~80°F ambient',
           ],
           ...(pack.habitat_notes || []),
-        ].map(([k, v]) => (
-          <div key={k} className="flex justify-between border-b border-border py-2 text-[13px] last:border-0">
-            <span className="text-muted">{k}</span>
-            <span className="max-w-[60%] text-right font-mono text-sand">{v}</span>
-          </div>
-        ))}
-      </Card>
+        ]}
+      />
     </div>
   )
 }

@@ -16,6 +16,14 @@
   --color-bg: #1a0e08;
   --color-border: #4a3020;
   --color-border-hi: #5a3a22;
+  --color-danger: #E08070;
+  --color-danger-bg: #3a1510;
+  --color-warn: #E8C080;
+  --color-warn-bg: #3a2a10;
+  --color-ok-bg: #1a3a20;
+  --color-accent-bg: #3a2414;
+  --color-chart: #C4946A;
+  --color-chart-grid: #9C8068;
   --font-display: "Playfair Display", serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: "Lato", sans-serif;
@@ -32,12 +40,20 @@ html[data-theme="casper"] {
   --color-charcoal: #ffffff;
   --color-bark: #eef4fa;
   --color-olive: #3a8a5a;
-  --color-sage: #3a8a5a;
+  --color-sage: #2f7a4e;
   --color-sky: #4a8ab8;
   --color-muted: #7a90a8;
   --color-bg: #e8edf2;
   --color-border: #dde4ec;
   --color-border-hi: #c8d4e0;
+  --color-danger: #c44a3a;
+  --color-danger-bg: #f8e8e6;
+  --color-warn: #9a6a18;
+  --color-warn-bg: #f5edd8;
+  --color-ok-bg: #e4f0e8;
+  --color-accent-bg: #e4eef6;
+  --color-chart: #2a5a8a;
+  --color-chart-grid: #7a90a8;
 }
 
 /* Arlo — dark warm amber (crested gecko) */
@@ -57,6 +73,14 @@ html[data-theme="arlo"] {
   --color-bg: #1a1008;
   --color-border: #3e2a10;
   --color-border-hi: #503818;
+  --color-danger: #E08070;
+  --color-danger-bg: #3a1510;
+  --color-warn: #E8C080;
+  --color-warn-bg: #3a2a10;
+  --color-ok-bg: #1a3a20;
+  --color-accent-bg: #3a2a10;
+  --color-chart: #C8943A;
+  --color-chart-grid: #8a7050;
 }
 
 html {
@@ -113,35 +137,34 @@ body {
   z-index: 50;
   display: flex;
   gap: 0;
-  padding: 4px;
-  border-radius: 30px;
-  border: 1px solid color-mix(in srgb, var(--color-sand) 35%, transparent);
-  background: color-mix(in srgb, var(--color-charcoal) 85%, transparent);
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-sand) 30%, transparent);
+  background: color-mix(in srgb, var(--color-charcoal) 88%, transparent);
   backdrop-filter: blur(10px);
 }
 
 .pet-toggle button {
   border: none;
   cursor: pointer;
-  padding: 7px 16px;
-  border-radius: 24px;
+  padding: 7px 14px;
+  border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: color-mix(in srgb, var(--color-bone) 40%, transparent);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-bone) 45%, transparent);
   background: transparent;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 html[data-theme="casper"] .pet-toggle button.active {
-  background: linear-gradient(135deg, #c8d8e8, #e8f0f8);
+  background: #dce8f2;
   color: #1a3a5a;
-  box-shadow: 0 2px 14px rgba(200, 216, 232, 0.4);
 }
 
 html[data-theme="arlo"] .pet-toggle button.active {
-  background: linear-gradient(135deg, #503818, #7a5828);
+  background: #503818;
   color: #e8c878;
-  box-shadow: 0 2px 14px rgba(200, 148, 58, 0.4);
 }

@@ -8,9 +8,13 @@ import {
   YAxis,
 } from 'recharts'
 import { api, todayStr, type AnimalOverview, type Weight, type Regurg } from '../api/client'
-import { Btn, BtnSm, Card, Empty, Field, Input, LogForm, SectionLabel, Select } from './ui'
+import { Btn, Empty, Field, Input, ListRow, LogForm, SectionLabel, Select } from './ui'
 
 const STAGE_ORDER = ['Hatchling', 'Juvenile', 'Sub-adult', 'Adult'] as const
+
+function chartColor(name: '--color-chart' | '--color-chart-grid' | '--color-charcoal' | '--color-bone' | '--color-border-hi') {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || undefined
+}
 
 export function FeedingTab({
   animal,
@@ -27,6 +31,11 @@ export function FeedingTab({
   const [rSeverity, setRSeverity] = useState('moderate')
   const [rNotes, setRNotes] = useState('')
   const showRegurg = animal.species_pack.supports_regurg
+  const [stroke, setStroke] = useState('#C4946A')
+  const [grid, setGrid] = useState('#9C8068')
+  const [tipBg, setTipBg] = useState('#2C201A')
+  const [tipFg, setTipFg] = useState('#F2E8D9')
+  const [tipBorder, setTipBorder] = useState('#5a3a22')
 
   async function load() {
     const w = await api.weights.list()
@@ -42,6 +51,14 @@ export function FeedingTab({
     void load()
   }, [animal.id])
 
+  useEffect(() => {
+    setStroke(chartColor('--color-chart') || '#C4946A')
+    setGrid(chartColor('--color-chart-grid') || '#9C8068')
+    setTipBg(chartColor('--color-charcoal') || '#2C201A')
+    setTipFg(chartColor('--color-bone') || '#F2E8D9')
+    setTipBorder(chartColor('--color-border-hi') || '#5a3a22')
+  }, [animal.id, animal.species_pack.theme])
+
   const stages = animal.feeding_stages
   const current = animal.stage.label
   const intervalDays = STAGE_ORDER.map((l) => stages[l]?.feeding_interval.recommended_days).filter(
@@ -53,13 +70,12 @@ export function FeedingTab({
   return (
     <div>
       <SectionLabel>Feeding frequency by life stage</SectionLabel>
-      <Card className="mb-3">
+      <div className="mb-1">
         {STAGE_ORDER.map((label) => {
           const rules = stages[label]
           if (!rules) return null
           const iv = rules.feeding_interval
           const cur = label === current
-          // Wider bar = more frequent. Scales to this species' stage band (snake or crestie).
           const widthPct =
             maxInterval === minInterval
               ? 70
@@ -67,26 +83,30 @@ export function FeedingTab({
           return (
             <div
               key={label}
-              className={`flex items-center justify-between border-b border-border py-2 text-[13px] last:border-0 ${cur ? 'rounded-md bg-[rgba(196,148,106,0.08)] px-2' : ''}`}
+              className={`flex items-center justify-between border-b border-border/70 py-2.5 text-[13px] last:border-0 ${
+                cur ? 'pl-2' : ''
+              }`}
+              style={cur ? { boxShadow: 'inset 3px 0 0 var(--color-sand)' } : undefined}
             >
               <span className={cur ? 'text-sand' : 'text-muted'}>
-                {cur ? `★ ${label}` : label} ({rules.desc})
+                {cur ? `★ ${label}` : label}{' '}
+                <span className="text-muted">({rules.desc})</span>
               </span>
               <div className="flex items-center gap-2">
-                <div className="h-1.5 w-28 overflow-hidden rounded bg-charcoal">
+                <div className="h-1 w-24 overflow-hidden rounded-sm bg-border sm:w-28">
                   <div
-                    className="h-full rounded bg-sand"
+                    className="h-full rounded-sm bg-sand"
                     style={{ width: `${Math.max(25, Math.min(100, widthPct))}%` }}
                   />
                 </div>
-                <span className="min-w-[90px] text-right font-mono text-[11px] text-sand">
+                <span className="min-w-[88px] text-right font-mono text-[11px] text-sand">
                   Every {iv.min_days}–{iv.max_days}d
                 </span>
               </div>
             </div>
           )
         })}
-      </Card>
+      </div>
 
       <SectionLabel>Weight log</SectionLabel>
       <LogForm title="Log Weight">
@@ -113,18 +133,18 @@ export function FeedingTab({
         </div>
       </LogForm>
 
-      <div className="mb-4 h-[180px] w-full">
+      <div className="mb-2 h-[180px] w-full">
         {weights.length === 0 ? (
           <Empty>Weight chart — no data yet.</Empty>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={weights.map((w) => ({ date: w.date, weight: w.weight_g }))}>
-              <XAxis dataKey="date" stroke="#9C8068" tick={{ fontSize: 11 }} />
-              <YAxis stroke="#9C8068" tick={{ fontSize: 11 }} />
+              <XAxis dataKey="date" stroke={grid} tick={{ fontSize: 11 }} />
+              <YAxis stroke={grid} tick={{ fontSize: 11 }} />
               <Tooltip
-                contentStyle={{ background: '#2C201A', border: '1px solid #5a3a22', color: '#F2E8D9' }}
+                contentStyle={{ background: tipBg, border: `1px solid ${tipBorder}`, color: tipFg }}
               />
-              <Line type="monotone" dataKey="weight" stroke="#C4946A" strokeWidth={2} dot={{ fill: '#C4946A' }} />
+              <Line type="monotone" dataKey="weight" stroke={stroke} strokeWidth={2} dot={{ fill: stroke }} />
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -134,88 +154,76 @@ export function FeedingTab({
       {weights.length === 0 ? (
         <Empty>No weights logged.</Empty>
       ) : (
-        <ul className="mb-4 space-y-2">
+        <ul className="mb-1">
           {[...weights].reverse().map((w) => (
-            <li
+            <ListRow
               key={w.id}
-              className="flex items-center justify-between rounded-lg border border-border bg-[#2a1a10] px-3 py-2 text-[13px]"
-            >
-              <div className="font-bold text-bone">
-                {w.date} · {w.weight_g}g
-              </div>
-              <BtnSm
-                onClick={async () => {
-                  await api.weights.remove(w.id)
-                  await load()
-                  onChange()
-                }}
-              >
-                ✕
-              </BtnSm>
-            </li>
+              primary={
+                <>
+                  <span className="font-mono text-[11px] text-sand">{w.date}</span>
+                  {` · ${w.weight_g}g`}
+                </>
+              }
+              onRemove={async () => {
+                await api.weights.remove(w.id)
+                await load()
+                onChange()
+              }}
+            />
           ))}
         </ul>
       )}
 
       {showRegurg && (
         <>
-      <SectionLabel>Regurgitation log</SectionLabel>
-      <p className="mb-2 text-[12px] text-muted">
-        Separate from refusal — regurgitation is a health red flag.
-      </p>
-      <LogForm title="Log Regurgitation">
-        <div className="mb-2 flex flex-wrap gap-2.5">
-          <Field label="Date">
-            <Input type="date" value={rDate} onChange={(e) => setRDate(e.target.value)} />
-          </Field>
-          <Field label="Severity">
-            <Select value={rSeverity} onChange={(e) => setRSeverity(e.target.value)}>
-              <option value="mild">Mild</option>
-              <option value="moderate">Moderate</option>
-              <option value="severe">Severe</option>
-            </Select>
-          </Field>
-          <Field label="Notes">
-            <Input value={rNotes} onChange={(e) => setRNotes(e.target.value)} placeholder="Details..." />
-          </Field>
-        </div>
-        <Btn
-          onClick={async () => {
-            await api.regurgitations.create({ date: rDate, severity: rSeverity, notes: rNotes })
-            setRNotes('')
-            await load()
-          }}
-        >
-          Log Regurg
-        </Btn>
-      </LogForm>
-      {regurgs.length === 0 ? (
-        <Empty>No regurgitations logged.</Empty>
-      ) : (
-        <ul className="space-y-2">
-          {regurgs.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center justify-between rounded-lg border border-[#E06050]/40 bg-[#3a1510] px-3 py-2 text-[13px]"
+          <SectionLabel>Regurgitation log</SectionLabel>
+          <p className="mb-2 text-[12px] text-muted">
+            Separate from refusal — regurgitation is a health red flag.
+          </p>
+          <LogForm title="Log Regurgitation">
+            <div className="mb-2 flex flex-wrap gap-2.5">
+              <Field label="Date">
+                <Input type="date" value={rDate} onChange={(e) => setRDate(e.target.value)} />
+              </Field>
+              <Field label="Severity">
+                <Select value={rSeverity} onChange={(e) => setRSeverity(e.target.value)}>
+                  <option value="mild">Mild</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="severe">Severe</option>
+                </Select>
+              </Field>
+              <Field label="Notes">
+                <Input value={rNotes} onChange={(e) => setRNotes(e.target.value)} placeholder="Details..." />
+              </Field>
+            </div>
+            <Btn
+              onClick={async () => {
+                await api.regurgitations.create({ date: rDate, severity: rSeverity, notes: rNotes })
+                setRNotes('')
+                await load()
+              }}
             >
-              <div>
-                <div className="font-bold text-[#E08070]">
-                  {r.date} · {r.severity}
-                </div>
-                <div className="text-muted">{r.notes || '—'}</div>
-              </div>
-              <BtnSm
-                onClick={async () => {
-                  await api.regurgitations.remove(r.id)
-                  await load()
-                }}
-              >
-                ✕
-              </BtnSm>
-            </li>
-          ))}
-        </ul>
-      )}
+              Log Regurg
+            </Btn>
+          </LogForm>
+          {regurgs.length === 0 ? (
+            <Empty>No regurgitations logged.</Empty>
+          ) : (
+            <ul>
+              {regurgs.map((r) => (
+                <ListRow
+                  key={r.id}
+                  tone="danger"
+                  primary={`${r.date} · ${r.severity}`}
+                  secondary={r.notes || undefined}
+                  onRemove={async () => {
+                    await api.regurgitations.remove(r.id)
+                    await load()
+                  }}
+                />
+              ))}
+            </ul>
+          )}
         </>
       )}
     </div>

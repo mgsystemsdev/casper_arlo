@@ -10,7 +10,7 @@ import {
   type Treatment,
   type VetVisit,
 } from '../api/client'
-import { Btn, BtnSm, Card, Field, Input, LogForm, SectionLabel, Select } from './ui'
+import { Btn, Field, Input, ListRow, LogForm, SectionLabel, Select } from './ui'
 
 export function HealthTab({
   animal,
@@ -107,25 +107,25 @@ export function HealthTab({
             </Btn>
           </LogForm>
           {tails.length === 0 ? (
-            <p className="mb-4 text-[12px] text-muted">No drops logged — tail intact.</p>
+            <p className="mb-1 text-[12px] text-muted">No drops logged — tail intact.</p>
           ) : (
-            <ul className="mb-4 space-y-2">
+            <ul className="mb-1">
               {tails.map((row) => (
-                <li key={row.id} className="flex justify-between rounded-lg border border-border-hi bg-bark px-3 py-2 text-[13px]">
-                  <span>
-                    <span className="font-mono text-sand">{row.date}</span> · {row.cause}
-                    {row.notes ? ` — ${row.notes}` : ''}
-                  </span>
-                  <BtnSm
-                    onClick={async () => {
-                      await api.tailEvents.remove(row.id)
-                      await load()
-                      onChange()
-                    }}
-                  >
-                    ✕
-                  </BtnSm>
-                </li>
+                <ListRow
+                  key={row.id}
+                  primary={
+                    <>
+                      <span className="font-mono text-[11px] text-sand">{row.date}</span>
+                      {` · ${row.cause}`}
+                    </>
+                  }
+                  secondary={row.notes || undefined}
+                  onRemove={async () => {
+                    await api.tailEvents.remove(row.id)
+                    await load()
+                    onChange()
+                  }}
+                />
               ))}
             </ul>
           )}
@@ -185,32 +185,26 @@ export function HealthTab({
           Log Shed Status
         </Btn>
       </LogForm>
-      <div className="mb-4 space-y-2">
+      <ul className="mb-1">
         {sheds.map((s) => (
-          <div key={s.id} className="flex items-center gap-3 rounded-[10px] border border-border bg-charcoal p-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-border-hi bg-bark text-xl">
-              🦎
-            </div>
-            <div className="flex-1">
-              <div className="text-[13px] font-bold text-bone">
-                {s.started_at} · <span className="text-sand">{s.status}</span>
-              </div>
-              <div className="mt-0.5 text-[12px] text-muted">
-                {s.quality || '—'} · {pack.supports_tail ? 'Toes' : 'Eyes'}: {s.eyes || '—'}
-              </div>
-            </div>
-            <BtnSm
-              onClick={async () => {
-                await api.shedCycles.remove(s.id)
-                await load()
-                onChange()
-              }}
-            >
-              ✕
-            </BtnSm>
-          </div>
+          <ListRow
+            key={s.id}
+            primary={
+              <>
+                <span className="font-mono text-[11px] text-sand">{s.started_at}</span>
+                {' · '}
+                <span className="text-sand">{s.status}</span>
+              </>
+            }
+            secondary={`${s.quality || '—'} · ${pack.supports_tail ? 'Toes' : 'Eyes'}: ${s.eyes || '—'}`}
+            onRemove={async () => {
+              await api.shedCycles.remove(s.id)
+              await load()
+              onChange()
+            }}
+          />
         ))}
-      </div>
+      </ul>
 
       <SectionLabel>Poop / urates</SectionLabel>
       <LogForm title="Elimination Log">
@@ -240,23 +234,19 @@ export function HealthTab({
         </Btn>
       </LogForm>
       {elims.length === 0 ? (
-        <div className="mb-3 p-4 text-center text-[13px] text-muted">No eliminations logged.</div>
+        <p className="mb-1 py-4 text-center text-[13px] text-muted">No eliminations logged.</p>
       ) : (
-        <ul className="mb-4 space-y-1">
+        <ul className="mb-1">
           {elims.map((e) => (
-            <li key={e.id} className="flex justify-between text-[13px] text-bone-dark">
-              <span>
-                {e.date} · {e.kind} {e.notes ? `— ${e.notes}` : ''}
-              </span>
-              <BtnSm
-                onClick={async () => {
-                  await api.eliminations.remove(e.id)
-                  await load()
-                }}
-              >
-                ✕
-              </BtnSm>
-            </li>
+            <ListRow
+              key={e.id}
+              primary={`${e.date} · ${e.kind}`}
+              secondary={e.notes || undefined}
+              onRemove={async () => {
+                await api.eliminations.remove(e.id)
+                await load()
+              }}
+            />
           ))}
         </ul>
       )}
@@ -286,21 +276,19 @@ export function HealthTab({
           Save Treatment
         </Btn>
       </LogForm>
-      {treatments.map((t) => (
-        <div key={t.id} className="mb-1 flex justify-between text-[13px] text-bone-dark">
-          <span>
-            {t.started_at} · {t.name} {t.reason ? `(${t.reason})` : ''}
-          </span>
-          <BtnSm
-            onClick={async () => {
+      <ul className="mb-1">
+        {treatments.map((t) => (
+          <ListRow
+            key={t.id}
+            primary={`${t.started_at} · ${t.name}`}
+            secondary={t.reason || undefined}
+            onRemove={async () => {
               await api.treatments.remove(t.id)
               await load()
             }}
-          >
-            ✕
-          </BtnSm>
-        </div>
-      ))}
+          />
+        ))}
+      </ul>
 
       <SectionLabel>Vet visits</SectionLabel>
       <LogForm title="Log Vet Visit">
@@ -328,29 +316,26 @@ export function HealthTab({
         </Btn>
       </LogForm>
       {vets.length === 0 ? (
-        <div className="mb-3 p-4 text-center text-[13px] text-muted">No vet visits logged.</div>
+        <p className="mb-1 py-4 text-center text-[13px] text-muted">No vet visits logged.</p>
       ) : (
-        <table className="mb-4 w-full text-[12px]">
-          <tbody>
-            {vets.map((v) => (
-              <tr key={v.id} className="border-b border-[#3a2415] text-bone-dark">
-                <td className="px-2 py-2 font-mono">{v.date}</td>
-                <td className="px-2 py-2">{v.reason}</td>
-                <td className="px-2 py-2 text-muted">{v.notes || '—'}</td>
-                <td className="px-2 py-2">
-                  <BtnSm
-                    onClick={async () => {
-                      await api.vetVisits.remove(v.id)
-                      await load()
-                    }}
-                  >
-                    ✕
-                  </BtnSm>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ul className="mb-1">
+          {vets.map((v) => (
+            <ListRow
+              key={v.id}
+              primary={
+                <>
+                  <span className="font-mono text-[11px] text-sand">{v.date}</span>
+                  {` · ${v.reason}`}
+                </>
+              }
+              secondary={v.notes || undefined}
+              onRemove={async () => {
+                await api.vetVisits.remove(v.id)
+                await load()
+              }}
+            />
+          ))}
+        </ul>
       )}
 
       <SectionLabel>Vet / emergency contacts</SectionLabel>
@@ -393,39 +378,37 @@ export function HealthTab({
           Add Contact
         </Btn>
       </LogForm>
-      {contacts.map((c) => (
-        <Card key={c.id} className="mb-2 flex justify-between">
-          <div>
-            <div className="text-[13px] font-bold text-bone">
-              {c.label} {c.is_emergency ? <span className="text-[#E06050]">· Emergency</span> : null}
-            </div>
-            <div className="text-[12px] text-muted">
-              {c.phone} {c.clinic ? `· ${c.clinic}` : ''}
-            </div>
-          </div>
-          <BtnSm
-            onClick={async () => {
+      <ul className="mb-1">
+        {contacts.map((c) => (
+          <ListRow
+            key={c.id}
+            primary={
+              <>
+                {c.label}
+                {c.is_emergency ? <span className="text-danger"> · Emergency</span> : null}
+              </>
+            }
+            secondary={[c.phone, c.clinic].filter(Boolean).join(' · ') || undefined}
+            onRemove={async () => {
               await api.contacts.remove(c.id)
               await load()
             }}
-          >
-            ✕
-          </BtnSm>
-        </Card>
-      ))}
+          />
+        ))}
+      </ul>
 
       <SectionLabel>Health indicators</SectionLabel>
-      <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+      <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {pack.health_indicators.map(([dot, textLabel, label]) => (
-          <div key={textLabel} className="flex items-center gap-2.5 rounded-lg border border-border bg-charcoal p-3">
+          <div key={textLabel} className="flex items-start gap-2.5 py-1">
             <div
-              className={`h-2.5 w-2.5 shrink-0 rounded-full ${
-                dot === 'good' ? 'bg-sage' : dot === 'warn' ? 'bg-[#D4A040]' : 'bg-[#E06050]'
+              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                dot === 'good' ? 'bg-sage' : dot === 'warn' ? 'bg-warn' : 'bg-danger'
               }`}
             />
             <div>
-              <div className="text-[12px] text-bone-dark">{textLabel}</div>
-              <div className="text-[10px] text-muted">{label}</div>
+              <div className="text-[13px] text-bone-dark">{textLabel}</div>
+              <div className="text-[11px] text-muted">{label}</div>
             </div>
           </div>
         ))}

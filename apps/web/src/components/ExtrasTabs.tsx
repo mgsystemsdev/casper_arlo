@@ -67,10 +67,10 @@ export function JournalTab({ animal }: { animal: AnimalOverview }) {
       {rows.length === 0 ? (
         <Empty>No journal entries yet.</Empty>
       ) : (
-        <ul className="space-y-3">
+        <ul>
           {rows.map((r) => (
-            <li key={r.id} className="rounded-[10px] border border-border bg-charcoal p-3.5">
-              <div className="mb-1 flex justify-between">
+            <li key={r.id} className="border-b border-border py-4 last:border-0">
+              <div className="mb-1.5 flex justify-between gap-3">
                 <span className="font-mono text-[11px] text-sand">{r.date}</span>
                 <BtnSm
                   onClick={async () => {
@@ -81,7 +81,7 @@ export function JournalTab({ animal }: { animal: AnimalOverview }) {
                   ✕
                 </BtnSm>
               </div>
-              <p className="whitespace-pre-wrap text-[13px] text-bone-dark">{r.body}</p>
+              <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-bone-dark">{r.body}</p>
             </li>
           ))}
         </ul>
@@ -148,16 +148,20 @@ export function PhotosTab({ animal }: { animal: AnimalOverview }) {
       {photos.length === 0 ? (
         <Empty>No photos yet.</Empty>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {photos.map((p) => (
-            <div key={p.id} className="overflow-hidden rounded-[10px] border border-border-hi bg-bark">
-              <img src={mediaUrl(p.url)} alt={p.caption || p.kind} className="aspect-square w-full object-cover" />
-              <div className="flex items-start justify-between p-2">
-                <div>
+            <div key={p.id} className="overflow-hidden">
+              <img
+                src={mediaUrl(p.url)}
+                alt={p.caption || p.kind}
+                className="aspect-square w-full rounded-md object-cover"
+              />
+              <div className="mt-2 flex items-start justify-between gap-2">
+                <div className="min-w-0">
                   <div className="font-mono text-[10px] text-sand">
                     {p.taken_at} · {p.kind}
                   </div>
-                  <div className="text-[12px] text-bone-dark">{p.caption || '—'}</div>
+                  <div className="truncate text-[12px] text-bone-dark">{p.caption || '—'}</div>
                 </div>
                 <BtnSm
                   onClick={async () => {

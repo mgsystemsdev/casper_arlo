@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api, todayStr, type AnimalOverview, type Handling } from '../api/client'
 import { useCountdown } from '../hooks/useCountdown'
-import { Btn, BtnSm, Empty, Field, Input, LogForm, SectionLabel, Select } from './ui'
+import { Alert, Btn, Empty, Field, Input, ListRow, LogForm, SectionLabel, Select } from './ui'
 
 export function HandlingTab({ animal, onChange }: { animal: AnimalOverview; onChange: () => void }) {
   const [rows, setRows] = useState<Handling[]>([])
@@ -31,14 +31,10 @@ export function HandlingTab({ animal, onChange }: { animal: AnimalOverview; onCh
 
   return (
     <div>
-      <div
-        className={`mb-4 rounded-lg border px-3 py-3 text-[13px] ${
-          blocked ? 'border-[#D4A040] bg-[#3a2a10] text-[#E8C080]' : 'border-olive bg-[#1a3a20] text-sage'
-        }`}
-      >
+      <Alert tone={blocked ? 'warn' : 'ok'} className="mb-1">
         {blocked ? (
           <>
-            <div className="font-bold">
+            <div className="font-semibold">
               {hours}h post-feed timer — {timer.label || animal.clear_to_handle.countdown || '…'} remaining
             </div>
             <div className="mt-1 text-[12px] opacity-90">
@@ -52,14 +48,14 @@ export function HandlingTab({ animal, onChange }: { animal: AnimalOverview; onCh
             </div>
           </>
         ) : (
-          <div className="font-bold">{animal.clear_to_handle.message}</div>
+          <div className="font-semibold">{animal.clear_to_handle.message}</div>
         )}
         {animal.species_pack.key === 'crested_gecko' && (
           <div className="mt-1 text-[12px] opacity-90">
             Cresties: keep sessions short; never grab the tail.
           </div>
         )}
-      </div>
+      </Alert>
 
       <SectionLabel>Log handling — {animal.name}</SectionLabel>
       <LogForm title="Handling Session">
@@ -107,28 +103,22 @@ export function HandlingTab({ animal, onChange }: { animal: AnimalOverview; onCh
       {rows.length === 0 ? (
         <Empty>No handling sessions logged.</Empty>
       ) : (
-        <ul className="space-y-2">
+        <ul>
           {rows.map((r) => (
-            <li
+            <ListRow
               key={r.id}
-              className="flex items-center justify-between rounded-lg border border-border bg-[#2a1a10] px-3 py-2 text-[13px]"
-            >
-              <div>
-                <div className="font-bold text-bone">
-                  {r.date} · {r.duration_min} min · {r.temperament}
-                </div>
-                <div className="text-muted">{r.notes || '—'}</div>
-              </div>
-              <BtnSm
-                onClick={async () => {
-                  await api.handlings.remove(r.id)
-                  await load()
-                  onChange()
-                }}
-              >
-                ✕
-              </BtnSm>
-            </li>
+              primary={
+                <>
+                  <span className="font-mono text-[11px] text-sand">{r.date}</span>
+                  {` · ${r.duration_min} min · ${r.temperament}`}
+                </>
+              }
+              secondary={r.notes || undefined}
+              onRemove={async () => {
+                await api.handlings.remove(r.id)
+                await load()
+              }}
+            />
           ))}
         </ul>
       )}

@@ -1,4 +1,4 @@
-import { Card, SectionLabel } from './ui'
+import { FactList, SectionLabel } from './ui'
 import type { AnimalOverview } from '../api/client'
 
 const STAGE_ORDER = ['Hatchling', 'Juvenile', 'Sub-adult', 'Adult'] as const
@@ -12,14 +12,17 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
 
   return (
     <div>
-      <p className="mb-3.5 text-[13px] text-muted">
-        {animal.name} is a <strong className="text-sand">{current.toLowerCase()}</strong> (
+      <p className="mb-1 max-w-2xl text-[14px] leading-relaxed text-bone-dark">
+        {animal.name} is a <span className="text-sand">{current.toLowerCase()}</span> (
         {animal.age.months} mo). Safest rhythm now: about every{' '}
-        <strong className="text-sand">
+        <span className="font-display text-lg font-semibold text-sand">
           {animal.feeding_recommendation.feeding_interval.recommended_days}d
-        </strong>{' '}
-        (stay within {animal.feeding_recommendation.feeding_interval.min_days}–
-        {animal.feeding_recommendation.feeding_interval.max_days}).
+        </span>{' '}
+        <span className="text-muted">
+          (stay within {animal.feeding_recommendation.feeding_interval.min_days}–
+          {animal.feeding_recommendation.feeding_interval.max_days})
+        </span>
+        .
         {isPrey && (
           <>
             {' '}
@@ -31,38 +34,36 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
       {pack.guide_notes?.length > 0 && (
         <>
           <SectionLabel>Notes</SectionLabel>
-          <Card className="mb-3.5 text-[13px] text-bone-dark leading-relaxed">
-            <ul className="list-disc space-y-1 pl-4">
-              {pack.guide_notes.map((n) => (
-                <li key={n}>{n}</li>
-              ))}
-            </ul>
-          </Card>
+          <ul className="mb-1 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-bone-dark">
+            {pack.guide_notes.map((n) => (
+              <li key={n}>{n}</li>
+            ))}
+          </ul>
         </>
       )}
 
       <SectionLabel>{isPrey ? 'Other prey' : 'Occasional extras'}</SectionLabel>
-      <Card className="mb-3.5 text-[13px] text-bone-dark leading-relaxed">
+      <p className="mb-1 max-w-2xl text-[13px] leading-relaxed text-bone-dark">
         For {current}:{' '}
         {alt.length > 0 ? (
           <>
-            <strong className="text-sand">{alt.join(', ')}</strong> as occasional alternative only.
+            <span className="text-sand">{alt.join(', ')}</span> as occasional alternative only.
           </>
         ) : (
           <>no alternatives listed for this stage.</>
         )}{' '}
         Use sparingly.
-      </Card>
+      </p>
 
       <SectionLabel>{isPrey ? 'Prey' : 'Diet'} by life stage</SectionLabel>
-      <div className="overflow-x-auto rounded-[10px] border border-border">
-        <table className="w-full border-collapse text-left">
+      <div className="-mx-1 overflow-x-auto">
+        <table className="w-full min-w-[560px] border-collapse text-left">
           <thead>
-            <tr className="bg-charcoal">
+            <tr className="border-b border-border">
               {['Life Stage', 'Age', 'Recommended', 'Acceptable', 'Frequency'].map((h) => (
                 <th
                   key={h}
-                  className="border-b border-border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
+                  className="px-2.5 py-2 font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
                 >
                   {h}
                 </th>
@@ -78,20 +79,20 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
               return (
                 <tr
                   key={label}
-                  className={on ? 'bg-bark text-bone' : 'text-bone-dark'}
+                  className={on ? 'text-bone' : 'text-bone-dark'}
                   style={on ? { boxShadow: 'inset 3px 0 0 var(--color-sand)' } : undefined}
                 >
-                  <td className="border-b border-border px-2.5 py-2 text-[12px]">
+                  <td className={`border-b border-border/70 px-2.5 py-2.5 text-[12px] ${on ? 'text-sand' : ''}`}>
                     {on ? `★ ${label}` : label}
                   </td>
-                  <td className="border-b border-border px-2.5 py-2 text-[12px]">{rules.desc}</td>
-                  <td className="border-b border-border px-2.5 py-2 text-[12px]">
+                  <td className="border-b border-border/70 px-2.5 py-2.5 text-[12px]">{rules.desc}</td>
+                  <td className="border-b border-border/70 px-2.5 py-2.5 text-[12px]">
                     {rules.recommended.join(', ')}
                   </td>
-                  <td className="border-b border-border px-2.5 py-2 text-[12px]">
+                  <td className="border-b border-border/70 px-2.5 py-2.5 text-[12px]">
                     {rules.acceptable.join(', ') || '—'}
                   </td>
-                  <td className="border-b border-border px-2.5 py-2 font-mono text-[12px] text-sand">
+                  <td className="border-b border-border/70 px-2.5 py-2.5 font-mono text-[12px] text-sand">
                     Every {iv.min_days}–{iv.max_days} days
                   </td>
                 </tr>
@@ -101,10 +102,10 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
         </table>
       </div>
       <SectionLabel>Category rule</SectionLabel>
-      <Card className="mt-0 text-[13px] text-bone-dark leading-relaxed">
+      <p className="max-w-2xl text-[13px] leading-relaxed text-muted">
         Pick a {noun} category from the list. Age sets the stage; stage sets recommended vs acceptable
         vs too small / too large. Grams are optional logging only — not used for recommendations.
-      </Card>
+      </p>
     </div>
   )
 }
@@ -113,34 +114,20 @@ export function SpeciesTab({ animal }: { animal: AnimalOverview }) {
   const pack = animal.species_pack
   return (
     <div>
-      <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <Card>
+      <div className="mb-2 grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
           <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">Scientific name</div>
-          <div className="mt-1 font-mono text-sm italic text-bone">{animal.species}</div>
-        </Card>
-        <Card>
+          <div className="mt-1 font-display text-lg italic text-bone">{animal.species}</div>
+        </div>
+        <div>
           <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">Common names</div>
-          <div className="mt-1 text-[13px] text-bone-dark">{animal.common_name}</div>
-        </Card>
+          <div className="mt-1 text-[14px] text-bone-dark">{animal.common_name}</div>
+        </div>
       </div>
       <SectionLabel>Key facts</SectionLabel>
-      <Card>
-        {pack.facts.map(([k, v]) => (
-          <div key={k} className="flex items-center justify-between border-b border-border py-2 text-[13px] last:border-0">
-            <span className="text-muted">{k}</span>
-            <span className="text-right text-bone">{v}</span>
-          </div>
-        ))}
-      </Card>
+      <FactList rows={pack.facts} />
       <SectionLabel>Handling tips</SectionLabel>
-      <Card>
-        {pack.handling_tips.map(([k, v]) => (
-          <div key={k} className="flex items-center justify-between border-b border-border py-2 text-[13px] last:border-0">
-            <span className="text-muted">{k}</span>
-            <span className="text-right text-bone">{v}</span>
-          </div>
-        ))}
-      </Card>
+      <FactList rows={pack.handling_tips} />
     </div>
   )
 }
