@@ -109,7 +109,7 @@ export function HandlingTab({ animal, onChange }: { animal: AnimalOverview; onCh
               key={r.id}
               primary={
                 <>
-                  <span className="font-mono text-[11px] text-sand">{r.date}</span>
+                  <span className="font-mono text-[11px] text-muted">{r.date}</span>
                   {` · ${r.duration_min} min · ${r.temperament}`}
                 </>
               }

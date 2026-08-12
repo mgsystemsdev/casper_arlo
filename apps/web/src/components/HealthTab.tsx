@@ -115,7 +115,7 @@ export function HealthTab({
                   key={row.id}
                   primary={
                     <>
-                      <span className="font-mono text-[11px] text-sand">{row.date}</span>
+                      <span className="font-mono text-[11px] text-muted">{row.date}</span>
                       {` · ${row.cause}`}
                     </>
                   }
@@ -191,9 +191,9 @@ export function HealthTab({
             key={s.id}
             primary={
               <>
-                <span className="font-mono text-[11px] text-sand">{s.started_at}</span>
+                <span className="font-mono text-[11px] text-muted">{s.started_at}</span>
                 {' · '}
-                <span className="text-sand">{s.status}</span>
+                <span className="text-ink">{s.status}</span>
               </>
             }
             secondary={`${s.quality || '—'} · ${pack.supports_tail ? 'Toes' : 'Eyes'}: ${s.eyes || '—'}`}
@@ -324,7 +324,7 @@ export function HealthTab({
               key={v.id}
               primary={
                 <>
-                  <span className="font-mono text-[11px] text-sand">{v.date}</span>
+                  <span className="font-mono text-[11px] text-muted">{v.date}</span>
                   {` · ${v.reason}`}
                 </>
               }
@@ -403,11 +403,11 @@ export function HealthTab({
           <div key={textLabel} className="flex items-start gap-2.5 py-1">
             <div
               className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-                dot === 'good' ? 'bg-sage' : dot === 'warn' ? 'bg-warn' : 'bg-danger'
+                dot === 'good' ? 'bg-ok-bg' : dot === 'warn' ? 'bg-warn-bg' : 'bg-danger'
               }`}
             />
             <div>
-              <div className="text-[13px] text-bone-dark">{textLabel}</div>
+              <div className="text-[13px] text-ink">{textLabel}</div>
               <div className="text-[11px] text-muted">{label}</div>
             </div>
           </div>

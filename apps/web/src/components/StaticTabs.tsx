@@ -12,10 +12,10 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
 
   return (
     <div>
-      <p className="mb-1 max-w-2xl text-[14px] leading-relaxed text-bone-dark">
-        {animal.name} is a <span className="text-sand">{current.toLowerCase()}</span> (
+      <p className="mb-1 max-w-2xl text-[14px] leading-relaxed text-ink">
+        {animal.name} is a <span className="text-rose-deep">{current.toLowerCase()}</span> (
         {animal.age.months} mo). Safest rhythm now: about every{' '}
-        <span className="font-display text-lg font-semibold text-sand">
+        <span className="font-display text-lg font-semibold text-rose-deep">
           {animal.feeding_recommendation.feeding_interval.recommended_days}d
         </span>{' '}
         <span className="text-muted">
@@ -34,7 +34,7 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
       {pack.guide_notes?.length > 0 && (
         <>
           <SectionLabel>Notes</SectionLabel>
-          <ul className="mb-1 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-bone-dark">
+          <ul className="mb-1 list-disc space-y-1.5 pl-4 text-[13px] leading-relaxed text-ink">
             {pack.guide_notes.map((n) => (
               <li key={n}>{n}</li>
             ))}
@@ -43,11 +43,11 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
       )}
 
       <SectionLabel>{isPrey ? 'Other prey' : 'Occasional extras'}</SectionLabel>
-      <p className="mb-1 max-w-2xl text-[13px] leading-relaxed text-bone-dark">
+      <p className="mb-1 max-w-2xl text-[13px] leading-relaxed text-ink">
         For {current}:{' '}
         {alt.length > 0 ? (
           <>
-            <span className="text-sand">{alt.join(', ')}</span> as occasional alternative only.
+            <span className="text-rose-deep">{alt.join(', ')}</span> as occasional alternative only.
           </>
         ) : (
           <>no alternatives listed for this stage.</>
@@ -79,10 +79,10 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
               return (
                 <tr
                   key={label}
-                  className={on ? 'text-bone' : 'text-bone-dark'}
-                  style={on ? { boxShadow: 'inset 3px 0 0 var(--color-sand)' } : undefined}
+                  className={on ? 'text-ink' : 'text-muted'}
+                  style={on ? { boxShadow: 'inset 3px 0 0 var(--color-rose)' } : undefined}
                 >
-                  <td className={`border-b border-border/70 px-2.5 py-2.5 text-[12px] ${on ? 'text-sand' : ''}`}>
+                  <td className={`border-b border-border/70 px-2.5 py-2.5 text-[12px] ${on ? 'text-rose-deep' : ''}`}>
                     {on ? `★ ${label}` : label}
                   </td>
                   <td className="border-b border-border/70 px-2.5 py-2.5 text-[12px]">{rules.desc}</td>
@@ -92,7 +92,7 @@ export function PreyTab({ animal }: { animal: AnimalOverview }) {
                   <td className="border-b border-border/70 px-2.5 py-2.5 text-[12px]">
                     {rules.acceptable.join(', ') || '—'}
                   </td>
-                  <td className="border-b border-border/70 px-2.5 py-2.5 font-mono text-[12px] text-sand">
+                  <td className="border-b border-border/70 px-2.5 py-2.5 font-mono text-[12px] text-rose-deep">
                     Every {iv.min_days}–{iv.max_days} days
                   </td>
                 </tr>
@@ -117,11 +117,11 @@ export function SpeciesTab({ animal }: { animal: AnimalOverview }) {
       <div className="mb-2 grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">Scientific name</div>
-          <div className="mt-1 font-display text-lg italic text-bone">{animal.species}</div>
+          <div className="mt-1 font-display text-lg italic text-ink">{animal.species}</div>
         </div>
         <div>
           <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted">Common names</div>
-          <div className="mt-1 text-[14px] text-bone-dark">{animal.common_name}</div>
+          <div className="mt-1 text-[14px] text-ink">{animal.common_name}</div>
         </div>
       </div>
       <SectionLabel>Key facts</SectionLabel>

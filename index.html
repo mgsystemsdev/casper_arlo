@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#FFF8F0" />
   <title>Casper &amp; Arlo Care — use the app</title>
   <style>
     :root {
-      --bg: #1a1008;
-      --card: #2e1e0c;
-      --border: #503818;
-      --bone: #f2e8d0;
-      --muted: #8a7050;
-      --accent: #e8c878;
+      --bg: #fff8f0;
+      --surface: #ffffff;
+      --border: #f5dce4;
+      --ink: #4a3b3b;
+      --muted: #6f5a5b;
+      --rose: #e8a0b8;
+      --rose-deep: #a84d6c;
     }
     * { box-sizing: border-box; }
     body {
@@ -21,19 +23,16 @@
       place-items: center;
       padding: 24px;
       font-family: Georgia, "Times New Roman", serif;
-      color: var(--bone);
-      background: linear-gradient(160deg, #1a1008 0%, #231508 55%, #161008 100%);
+      color: var(--ink);
+      background: var(--bg);
     }
     main {
       width: min(440px, 100%);
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 24px;
+      padding: 8px 0 28px;
     }
     h1 {
       margin: 0 0 8px;
-      font-size: 1.6rem;
+      font-size: 2rem;
       font-weight: 600;
       letter-spacing: -0.02em;
     }
@@ -45,7 +44,16 @@
       color: var(--muted);
     }
     a {
-      color: var(--accent);
+      color: var(--rose-deep);
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      font-family: ui-monospace, monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
     .actions {
       display: flex;
@@ -61,17 +69,18 @@
       font-size: 0.8rem;
       font-weight: 700;
       letter-spacing: 0.04em;
-      padding: 12px 14px;
-      border-radius: 10px;
+      padding: 14px;
+      border-radius: 8px;
       border: 1px solid var(--border);
     }
     .btn.primary {
-      background: linear-gradient(135deg, #503818, #7a5828);
-      color: var(--accent);
+      background: var(--rose-deep);
+      border-color: var(--rose-deep);
+      color: #fff;
     }
     .btn.secondary {
-      background: transparent;
-      color: var(--bone);
+      background: var(--surface);
+      color: var(--ink);
     }
     .note {
       margin-top: 16px;
@@ -83,7 +92,8 @@
 </head>
 <body>
   <main>
-    <h1>Casper &amp; Arlo Care</h1>
+    <p class="eyebrow">Care log</p>
+    <h1>Casper &amp; Arlo</h1>
     <p>
       The old static dashboard is retired. Use the Care app for daily logging,
       digests, and both pets.

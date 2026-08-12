@@ -12,7 +12,9 @@ import { Btn, Empty, Field, Input, ListRow, LogForm, SectionLabel, Select } from
 
 const STAGE_ORDER = ['Hatchling', 'Juvenile', 'Sub-adult', 'Adult'] as const
 
-function chartColor(name: '--color-chart' | '--color-chart-grid' | '--color-charcoal' | '--color-bone' | '--color-border-hi') {
+function chartColor(
+  name: '--color-chart' | '--color-chart-grid' | '--color-surface' | '--color-ink' | '--color-border',
+) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || undefined
 }
 
@@ -31,11 +33,11 @@ export function FeedingTab({
   const [rSeverity, setRSeverity] = useState('moderate')
   const [rNotes, setRNotes] = useState('')
   const showRegurg = animal.species_pack.supports_regurg
-  const [stroke, setStroke] = useState('#C4946A')
-  const [grid, setGrid] = useState('#9C8068')
-  const [tipBg, setTipBg] = useState('#2C201A')
-  const [tipFg, setTipFg] = useState('#F2E8D9')
-  const [tipBorder, setTipBorder] = useState('#5a3a22')
+  const [stroke, setStroke] = useState('#E8A0B8')
+  const [grid, setGrid] = useState('#C4A8AE')
+  const [tipBg, setTipBg] = useState('#FFFFFF')
+  const [tipFg, setTipFg] = useState('#4A3B3B')
+  const [tipBorder, setTipBorder] = useState('#F5DCE4')
 
   async function load() {
     const w = await api.weights.list()
@@ -52,12 +54,12 @@ export function FeedingTab({
   }, [animal.id])
 
   useEffect(() => {
-    setStroke(chartColor('--color-chart') || '#C4946A')
-    setGrid(chartColor('--color-chart-grid') || '#9C8068')
-    setTipBg(chartColor('--color-charcoal') || '#2C201A')
-    setTipFg(chartColor('--color-bone') || '#F2E8D9')
-    setTipBorder(chartColor('--color-border-hi') || '#5a3a22')
-  }, [animal.id, animal.species_pack.theme])
+    setStroke(chartColor('--color-chart') || '#E8A0B8')
+    setGrid(chartColor('--color-chart-grid') || '#C4A8AE')
+    setTipBg(chartColor('--color-surface') || '#FFFFFF')
+    setTipFg(chartColor('--color-ink') || '#4A3B3B')
+    setTipBorder(chartColor('--color-border') || '#F5DCE4')
+  }, [animal.id])
 
   const stages = animal.feeding_stages
   const current = animal.stage.label
@@ -86,20 +88,20 @@ export function FeedingTab({
               className={`flex items-center justify-between border-b border-border/70 py-2.5 text-[13px] last:border-0 ${
                 cur ? 'pl-2' : ''
               }`}
-              style={cur ? { boxShadow: 'inset 3px 0 0 var(--color-sand)' } : undefined}
+              style={cur ? { boxShadow: 'inset 3px 0 0 var(--color-rose)' } : undefined}
             >
-              <span className={cur ? 'text-sand' : 'text-muted'}>
+              <span className={cur ? 'text-rose-deep' : 'text-muted'}>
                 {cur ? `★ ${label}` : label}{' '}
                 <span className="text-muted">({rules.desc})</span>
               </span>
               <div className="flex items-center gap-2">
                 <div className="h-1 w-24 overflow-hidden rounded-sm bg-border sm:w-28">
                   <div
-                    className="h-full rounded-sm bg-sand"
+                    className="h-full rounded-sm bg-rose"
                     style={{ width: `${Math.max(25, Math.min(100, widthPct))}%` }}
                   />
                 </div>
-                <span className="min-w-[88px] text-right font-mono text-[11px] text-sand">
+                <span className="min-w-[88px] text-right font-mono text-[11px] text-rose-deep">
                   Every {iv.min_days}–{iv.max_days}d
                 </span>
               </div>
@@ -160,7 +162,7 @@ export function FeedingTab({
               key={w.id}
               primary={
                 <>
-                  <span className="font-mono text-[11px] text-sand">{w.date}</span>
+                  <span className="font-mono text-[11px] text-muted">{w.date}</span>
                   {` · ${w.weight_g}g`}
                 </>
               }

@@ -51,7 +51,7 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
         {pack.habitat_zones.map((z) => (
           <div key={z.label}>
             <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">{z.label}</div>
-            <div className="mt-0.5 font-display text-xl font-semibold text-sand">{z.f}</div>
+            <div className="mt-0.5 font-display text-xl font-semibold text-ink">{z.f}</div>
             <div className="mt-0.5 text-[11px] text-muted">{z.c}</div>
           </div>
         ))}
@@ -170,7 +170,7 @@ export function HabitatTab({ animal }: { animal: AnimalOverview }) {
               key={m.id}
               primary={
                 <>
-                  <span className="font-mono text-[11px] text-sand">{m.date}</span>
+                  <span className="font-mono text-[11px] text-muted">{m.date}</span>
                   {' · '}
                   {m.kind === 'substrate'
                     ? 'Sub / mist'

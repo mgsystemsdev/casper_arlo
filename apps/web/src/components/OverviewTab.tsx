@@ -31,9 +31,9 @@ const STATUS_LABEL: Record<PreyStatus, string> = {
 }
 
 const STATUS_CLASS: Record<PreyStatus, string> = {
-  recommended: 'text-sage',
-  acceptable: 'text-sand',
-  alternative: 'text-bone-dark',
+  recommended: 'text-ok',
+  acceptable: 'text-rose-deep',
+  alternative: 'text-ink',
   too_small: 'text-warn',
   too_large: 'text-danger',
   unknown: 'text-muted',
@@ -95,28 +95,27 @@ export function OverviewTab({
 
   return (
     <div>
-      {animal.reminders.length > 0 && (
+      {animal.reminders.some((r) => r.severity === 'low') && (
         <>
-          <SectionLabel>Reminders</SectionLabel>
-          <div className="mb-1 flex flex-col gap-2">
-            {animal.reminders.map((r) => (
-              <Alert
-                key={r.kind + r.message}
-                tone={r.severity === 'high' ? 'danger' : r.severity === 'medium' ? 'warn' : 'neutral'}
-              >
-                <div>{r.message}</div>
-                {r.why && <div className="mt-1 text-[11px] opacity-70">{r.why}</div>}
-              </Alert>
-            ))}
+          <SectionLabel>Notes</SectionLabel>
+          <div className="mb-1 space-y-2">
+            {animal.reminders
+              .filter((r) => r.severity === 'low')
+              .map((r) => (
+                <p key={r.kind + r.message} className="text-[13px] leading-relaxed text-muted">
+                  {r.message}
+                  {r.why ? <span className="mt-0.5 block text-[11px]">{r.why}</span> : null}
+                </p>
+              ))}
           </div>
         </>
       )}
 
       <SectionLabel>Feeding recommendation · {fr.stage}</SectionLabel>
       <div className="mb-1 max-w-2xl">
-        <p className="text-[15px] leading-snug text-bone">
+        <p className="text-[15px] leading-snug text-ink">
           Every{' '}
-          <span className="font-display text-[1.35rem] font-semibold text-sand">
+          <span className="font-display text-[1.35rem] font-semibold text-rose-deep">
             {next?.interval_days ?? iv.recommended_days}d
           </span>
           <span className="text-muted">
@@ -125,7 +124,7 @@ export function OverviewTab({
             {next?.interval_source ? ` · ${next.interval_source}` : ''}
           </span>
         </p>
-        <p className="mt-2 text-[13px] leading-relaxed text-bone-dark">
+        <p className="mt-2 text-[13px] leading-relaxed text-ink">
           Suggested: {fr.suggested_prey ?? fr.recommended_prey[0] ?? '—'}
           {fr.suggestion_why ? ` — ${fr.suggestion_why}` : ''}
         </p>
@@ -232,12 +231,12 @@ export function OverviewTab({
               >
                 <div>
                   <div className="font-mono text-[11px] text-muted">{f.date}</div>
-                  <div className="mt-0.5 text-[13px] text-bone">
+                  <div className="mt-0.5 text-[13px] text-ink">
                     {f.prey_type}
                     {f.prey_weight_g != null ? ` · ${f.prey_weight_g}g` : ''}
                   </div>
                   <div
-                    className={`mt-0.5 text-[12px] font-medium ${f.accepted ? 'text-sage' : 'text-danger'}`}
+                    className={`mt-0.5 text-[12px] font-medium ${f.accepted ? 'text-ok' : 'text-danger'}`}
                   >
                     {f.accepted ? 'Accepted' : 'Refused'}
                     {f.snake_weight_g != null ? ` · animal ${f.snake_weight_g}g` : ''}
@@ -276,7 +275,7 @@ export function OverviewTab({
                     <Td mono>{f.date}</Td>
                     <Td>{f.prey_type}</Td>
                     <Td>{f.prey_weight_g != null ? `${f.prey_weight_g}g` : '—'}</Td>
-                    <Td className={f.accepted ? 'font-medium text-sage' : 'font-medium text-danger'}>
+                    <Td className={f.accepted ? 'font-medium text-ok' : 'font-medium text-danger'}>
                       {f.accepted ? 'Accepted' : 'Refused'}
                     </Td>
                     <Td>{f.snake_weight_g != null ? `${f.snake_weight_g}g` : '—'}</Td>

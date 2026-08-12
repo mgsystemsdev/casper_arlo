@@ -71,7 +71,7 @@ export function JournalTab({ animal }: { animal: AnimalOverview }) {
           {rows.map((r) => (
             <li key={r.id} className="border-b border-border py-4 last:border-0">
               <div className="mb-1.5 flex justify-between gap-3">
-                <span className="font-mono text-[11px] text-sand">{r.date}</span>
+                <span className="font-mono text-[11px] text-rose-deep">{r.date}</span>
                 <BtnSm
                   onClick={async () => {
                     await api.journal.remove(r.id)
@@ -81,7 +81,7 @@ export function JournalTab({ animal }: { animal: AnimalOverview }) {
                   ✕
                 </BtnSm>
               </div>
-              <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-bone-dark">{r.body}</p>
+              <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-ink">{r.body}</p>
             </li>
           ))}
         </ul>
@@ -158,10 +158,10 @@ export function PhotosTab({ animal }: { animal: AnimalOverview }) {
               />
               <div className="mt-2 flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="font-mono text-[10px] text-sand">
+                  <div className="font-mono text-[10px] text-rose-deep">
                     {p.taken_at} · {p.kind}
                   </div>
-                  <div className="truncate text-[12px] text-bone-dark">{p.caption || '—'}</div>
+                  <div className="truncate text-[12px] text-ink">{p.caption || '—'}</div>
                 </div>
                 <BtnSm
                   onClick={async () => {
@@ -191,7 +191,7 @@ function Toggle({
 }) {
   return (
     <label className="flex cursor-pointer items-center justify-between gap-3 border-b border-border py-2 text-[13px] last:border-0">
-      <span className="text-bone-dark">{label}</span>
+      <span className="text-ink">{label}</span>
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
     </label>
   )
@@ -231,7 +231,7 @@ export function SettingsTab({
       const doc = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${title}</title>
 <style>
   @page { margin: 16mm; }
-  body { margin: 0; background: #1a0e08; }
+  body { margin: 0; background: #FFF8F0; }
   @media print {
     body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
@@ -301,7 +301,7 @@ ${dig.html}
             Download CSV zip
           </Btn>
         </div>
-        {exportMsg && <p className="mt-2 font-mono text-[11px] text-sand">{exportMsg}</p>}
+        {exportMsg && <p className="mt-2 font-mono text-[11px] text-rose-deep">{exportMsg}</p>}
       </LogForm>
 
       <SectionLabel>Today’s digest</SectionLabel>
@@ -312,7 +312,7 @@ ${dig.html}
           <strong>{petName}</strong> only.
         </p>
         <Btn onClick={() => void downloadPdfToday()}>Download PDF today</Btn>
-        {pdfMsg && <p className="mt-2 font-mono text-[11px] text-sand">{pdfMsg}</p>}
+        {pdfMsg && <p className="mt-2 font-mono text-[11px] text-rose-deep">{pdfMsg}</p>}
       </LogForm>
 
       <SectionLabel>Email delivery</SectionLabel>
@@ -550,7 +550,7 @@ ${dig.html}
           Send today’s digest
         </Btn>
       </div>
-      {saveMsg && <p className="mb-2 font-mono text-[11px] text-sand">{saveMsg}</p>}
+      {saveMsg && <p className="mb-2 font-mono text-[11px] text-rose-deep">{saveMsg}</p>}
       {testMsg && <p className="mb-4 font-mono text-[11px] text-muted break-all">{testMsg}</p>}
       <p className="mb-4 text-[11px] text-muted">
         Care intervals and event toggles are per pet ({feedNoun} cadence for {petName}). Email destination and
@@ -663,9 +663,9 @@ function MigrateSection() {
       <LogForm title="archive/legacy-dashboard.html → Care">
         <p className="mb-2 text-[12px] text-muted">
           The static dashboard is retired (archive only). Open{" "}
-          <code className="text-sand">archive/legacy-dashboard.html</code>, click <strong>Export for app</strong>, then
-          upload that JSON here. Casper keys (<code className="text-sand">c_*</code>) and Arlo keys (
-          <code className="text-sand">a_*</code> / <code className="text-sand">a_tail</code>) map automatically.
+          <code className="text-rose-deep">archive/legacy-dashboard.html</code>, click <strong>Export for app</strong>, then
+          upload that JSON here. Casper keys (<code className="text-rose-deep">c_*</code>) and Arlo keys (
+          <code className="text-rose-deep">a_*</code> / <code className="text-rose-deep">a_tail</code>) map automatically.
         </p>
         <div className="mb-2 flex flex-wrap gap-2">
           <Field label="Export JSON file">
@@ -712,7 +712,7 @@ function MigrateSection() {
           </p>
         )}
         {status && (
-          <p className="mt-2 font-mono text-[11px] text-sand whitespace-pre-wrap break-all">{status}</p>
+          <p className="mt-2 font-mono text-[11px] text-rose-deep whitespace-pre-wrap break-all">{status}</p>
         )}
       </LogForm>
     </>
@@ -742,7 +742,7 @@ export function LocalTab({ animal }: { animal: AnimalOverview }) {
 
   return (
     <div>
-      <p className="mb-4 rounded-lg border border-border bg-bark px-3 py-2 text-[12px] text-sand">
+      <p className="mb-4 rounded-lg border border-border bg-surface px-3 py-2 text-[12px] text-rose-deep">
         Dev single-pet paste. For a full Casper + Arlo migration use <strong>Settings → Migrate from static page</strong>.
       </p>
 
@@ -791,7 +791,7 @@ export function LocalTab({ animal }: { animal: AnimalOverview }) {
         >
           Import into {animal.name}
         </Btn>
-        {importStatus && <p className="mt-2 font-mono text-[11px] text-sand">{importStatus}</p>}
+        {importStatus && <p className="mt-2 font-mono text-[11px] text-rose-deep">{importStatus}</p>}
       </LogForm>
     </div>
   )

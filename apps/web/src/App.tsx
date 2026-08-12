@@ -9,6 +9,7 @@ import {
   type AnimalOverview,
   type AnimalSummary,
   type Feed,
+  type Reminder,
 } from './api/client'
 import { JournalTab, LocalTab, PhotosTab, SettingsTab } from './components/ExtrasTabs'
 import { FeedingTab } from './components/FeedingTab'
@@ -33,21 +34,19 @@ type TabId =
   | 'settings'
   | 'local'
 
-function applyTheme(theme: string) {
-  document.documentElement.setAttribute('data-theme', theme === 'casper' ? 'casper' : 'arlo')
-}
-
 function Login({ onOk }: { onOk: () => void }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   return (
-    <div className="w-full max-w-md rounded-none border-0 bg-charcoal p-6 sm:rounded-xl sm:border sm:border-border sm:p-8">
-      <h1 className="font-display text-[2rem] font-semibold tracking-tight text-bone">Casper & Arlo</h1>
-      <p className="mt-1 font-mono text-[11px] tracking-[0.08em] text-muted">Care log</p>
+    <div className="w-full max-w-md px-6 py-10 sm:px-0">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted">Care log</p>
+      <h1 className="mt-2 font-display text-[2.25rem] font-semibold tracking-tight text-ink">
+        Casper & Arlo
+      </h1>
       <form
-        className="mt-7 space-y-3"
+        className="mt-8 space-y-3"
         onSubmit={async (e) => {
           e.preventDefault()
           setBusy(true)
@@ -97,6 +96,39 @@ function daysUntilBirthday(dobIso: string): number {
   return Math.round((next.getTime() - today.getTime()) / 86400000)
 }
 
+function reminderLabel(severity: string) {
+  if (severity === 'high') return 'Needs attention'
+  if (severity === 'medium') return 'Due soon'
+  return 'Note'
+}
+
+function ReminderList({ reminders }: { reminders: Reminder[] }) {
+  if (!reminders.length) return null
+  return (
+    <section className="mt-5 space-y-1" aria-label="Care reminders">
+      {reminders.map((r) => {
+        const tone =
+          r.severity === 'high' ? 'reminder-high' : r.severity === 'medium' ? 'reminder-medium' : 'reminder-low'
+        return (
+          <div key={r.kind + r.message} className={`reminder ${tone}`}>
+            <div
+              className={`font-mono text-[10px] font-bold uppercase tracking-[0.1em] ${
+                r.severity === 'high' ? 'text-warn' : r.severity === 'medium' ? 'text-rose-deep' : 'text-muted'
+              }`}
+            >
+              {reminderLabel(r.severity)}
+            </div>
+            <div className={`mt-0.5 text-[13px] leading-snug ${r.severity === 'high' ? 'text-warn' : 'text-ink'}`}>
+              {r.message}
+            </div>
+            {r.why && <div className="mt-0.5 text-[11px] leading-relaxed text-muted">{r.why}</div>}
+          </div>
+        )
+      })}
+    </section>
+  )
+}
+
 export default function App() {
   const [authed, setAuthed] = useState(!!getToken())
   const [tab, setTab] = useState<TabId>('overview')
@@ -117,11 +149,9 @@ export default function App() {
       const stored = getActiveAnimalId()
       const pick = list.find((a) => a.id === stored) || list[0]
       setActiveAnimalId(pick.id)
-      applyTheme(pick.theme)
       const [a, f] = await Promise.all([api.animal(), api.feeds.list()])
       setAnimal(a)
       setFeeds(f)
-      applyTheme(a.species_pack.theme)
       setError('')
     } catch (e) {
       if (String(e).includes('Unauthorized')) {
@@ -140,13 +170,10 @@ export default function App() {
     setActiveAnimalId(id)
     setAnimal(null)
     setTab('overview')
-    const pick = animals.find((a) => a.id === id)
-    if (pick) applyTheme(pick.theme)
     try {
       const [a, f] = await Promise.all([api.animal(), api.feeds.list()])
       setAnimal(a)
       setFeeds(f)
-      applyTheme(a.species_pack.theme)
       setError('')
     } catch (e) {
       setError(String(e))
@@ -185,7 +212,7 @@ export default function App() {
 
   if (!animal) {
     return (
-      <div className="w-full max-w-[1100px] bg-charcoal p-8 text-muted sm:rounded-xl sm:border sm:border-border">
+      <div className="w-full max-w-[1100px] px-6 py-10 text-muted sm:px-0">
         {error || 'Loading…'}
       </div>
     )
@@ -217,7 +244,7 @@ export default function App() {
         ? 'danger'
         : animal.next_feed.days_until <= 2
           ? 'warn'
-          : 'sand'
+          : 'ok'
 
   const feedLabel = animal.next_feed
     ? animal.next_feed.days_until < 0
@@ -232,8 +259,8 @@ export default function App() {
       ? 'text-danger'
       : feedUrgency === 'warn'
         ? 'text-warn'
-        : feedUrgency === 'sand'
-          ? 'text-sand'
+        : feedUrgency === 'ok'
+          ? 'text-ink'
           : 'text-muted'
 
   const maintLabel = animal.next_maintenance
@@ -267,83 +294,95 @@ export default function App() {
       : 'No drop'
     : animal.last_shed?.quality || 'None'
 
+  const mastheadReminders = animal.reminders.filter((r) => r.severity === 'high' || r.severity === 'medium')
+
   return (
-    <>
-      {animals.length > 1 && (
-        <div className="pet-toggle" role="group" aria-label="Switch pet">
-          {animals.map((a) => (
-            <button
-              key={a.id}
-              type="button"
-              className={a.id === animal.id ? 'active' : ''}
-              onClick={() => void switchPet(a.id)}
-            >
-              {a.name}
-            </button>
-          ))}
-        </div>
-      )}
-    <div className="w-full max-w-[1100px] overflow-hidden bg-charcoal text-bone sm:rounded-xl sm:border sm:border-border">
-      <header className="border-b border-border px-4 pb-5 pt-5 sm:px-7 sm:pt-6">
+    <div className="w-full max-w-[1100px] text-ink">
+      <header className="px-4 pb-6 pt-5 sm:px-7 sm:pt-8">
         <div className="flex items-start justify-between gap-4">
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted">Casper & Arlo</p>
+          <div className="shrink-0 text-right font-mono text-[11px] tracking-wide text-muted">{clock}</div>
+        </div>
+
+        {animals.length > 1 && (
+          <div className="mt-4" role="group" aria-label="Switch pet">
+            <div className="pet-toggle">
+              {animals.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  className={a.id === animal.id ? 'active' : ''}
+                  aria-pressed={a.id === animal.id}
+                  onClick={() => void switchPet(a.id)}
+                >
+                  {a.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-5 flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="font-display text-[1.75rem] font-semibold leading-none tracking-tight text-bone sm:text-[2rem]">
+            <h1 className="font-display text-[1.85rem] font-semibold leading-none tracking-tight text-ink sm:text-[2.15rem]">
               {animal.name}
             </h1>
             <p className="mt-2 text-[13px] leading-relaxed text-muted">
-              <span className="italic text-bone-dark">{animal.species}</span>
-              <span className="mx-1.5 text-border-hi">·</span>
+              <span className="italic text-ink">{animal.species}</span>
+              <span className="mx-1.5 text-border">·</span>
               {animal.common_name}
-              <span className="mx-1.5 text-border-hi">·</span>
+              <span className="mx-1.5 text-border">·</span>
               {animal.sex?.toLowerCase().startsWith('f') ? '♀' : '♂'} {animal.sex}
-              <span className="mx-1.5 text-border-hi">·</span>
+              <span className="mx-1.5 text-border">·</span>
               {animal.owner}
             </p>
-            <p className="mt-1.5 font-mono text-[11px] tracking-wide text-muted">
-              {animal.stage.label} · {animal.stage.desc}
-              {bdayIn === 0
-                ? ` · ${animal.age.months} mo · birthday today`
-                : ` · ${animal.age.months} mo · born ${formatDob(animal.dob)}`}
-            </p>
+            <div className="mt-2.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+              <span className="stage-badge">{animal.stage.label}</span>
+              <span className="font-mono text-[11px] tracking-wide text-muted">
+                {animal.stage.desc}
+                {bdayIn === 0
+                  ? ` · ${animal.age.months} mo · birthday today`
+                  : ` · ${animal.age.months} mo · born ${formatDob(animal.dob)}`}
+              </span>
+            </div>
           </div>
-          <div className="shrink-0 text-right">
-            <div className="font-mono text-[11px] tracking-wide text-muted">{clock}</div>
-            <div className="mt-1.5 text-[12px] text-sage">{animal.status}</div>
+          <div className="shrink-0 pt-1 text-right">
+            <div className="text-[12px] font-medium text-ok">{animal.status}</div>
           </div>
         </div>
 
-        {/* Primary care signals — one strong row, not five equal cards */}
-        <div className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-2">
+        <div className="mt-7 grid grid-cols-1 gap-5 border-t border-border pt-5 sm:grid-cols-2">
           <div>
             <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
               Next {pack.food_noun === 'prey' ? 'feed' : 'meal'}
             </div>
-            <div className={`mt-1 font-display text-[1.65rem] font-semibold leading-none ${feedToneClass}`}>
+            <div className={`mt-1.5 font-display text-[1.7rem] font-semibold leading-none ${feedToneClass}`}>
               {feedLabel}
             </div>
-            <div className="mt-1 font-mono text-[12px] text-muted">
+            <div className="mt-1.5 font-mono text-[12px] text-muted">
               {animal.next_feed?.due_date || 'No schedule yet'}
             </div>
           </div>
           <div className="sm:text-right">
             <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">Handling</div>
             <div
-              className={`mt-1 font-display text-[1.65rem] font-semibold leading-none ${
-                animal.clear_to_handle.ready ? 'text-sage' : 'text-warn'
+              className={`mt-1.5 font-display text-[1.7rem] font-semibold leading-none ${
+                animal.clear_to_handle.ready ? 'text-ok' : 'text-warn'
               }`}
             >
               {animal.clear_to_handle.ready
                 ? 'Clear'
                 : handleTimer.label || animal.clear_to_handle.countdown || '…'}
             </div>
-            <div className="mt-1 font-mono text-[12px] text-muted">
-              {animal.clear_to_handle.ready ? 'Ready to handle' : `${animal.clear_to_handle.clear_after_hours}h post-feed wait`}
+            <div className="mt-1.5 font-mono text-[12px] text-muted">
+              {animal.clear_to_handle.ready
+                ? 'Ready to handle'
+                : `${animal.clear_to_handle.clear_after_hours}h post-feed wait`}
             </div>
           </div>
         </div>
 
-        {/* Secondary metrics — quiet strip, no boxes */}
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-3.5 sm:grid-cols-4">
+        <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-border pt-4 sm:grid-cols-4">
           <div>
             <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">Maintenance</dt>
             <dd
@@ -352,7 +391,7 @@ export default function App() {
                   ? 'text-danger'
                   : animal.next_maintenance && animal.next_maintenance.days_until <= 1
                     ? 'text-warn'
-                    : 'text-bone-dark'
+                    : 'text-ink'
               }`}
             >
               {maintLabel}
@@ -360,11 +399,7 @@ export default function App() {
           </div>
           <div>
             <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">Last handled</dt>
-            <dd
-              className={`mt-0.5 text-[12px] ${
-                animal.handling_gap.overdue ? 'text-warn' : 'text-bone-dark'
-              }`}
-            >
+            <dd className={`mt-0.5 text-[12px] ${animal.handling_gap.overdue ? 'text-warn' : 'text-ink'}`}>
               {handlingLabel}
             </dd>
           </div>
@@ -372,14 +407,14 @@ export default function App() {
             <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
               {pack.supports_tail ? 'Tail' : 'Last shed'}
             </dt>
-            <dd className="mt-0.5 text-[12px] text-bone-dark">
+            <dd className="mt-0.5 text-[12px] text-ink">
               {fifthLabel}
               <span className="text-muted"> · {fifthDetail}</span>
             </dd>
           </div>
           <div>
             <dt className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted">Weight</dt>
-            <dd className="mt-0.5 text-[12px] text-bone-dark">
+            <dd className="mt-0.5 text-[12px] text-ink">
               {animal.current_weight_g != null ? `${animal.current_weight_g}g` : '—'}
               {animal.current_weight_date ? (
                 <span className="text-muted"> · {animal.current_weight_date.slice(5)}</span>
@@ -387,9 +422,11 @@ export default function App() {
             </dd>
           </div>
         </dl>
+
+        <ReminderList reminders={mastheadReminders} />
       </header>
 
-      <nav className="sticky top-0 z-10 flex gap-0 overflow-x-auto border-b border-border bg-charcoal/95 backdrop-blur-sm scrollbar-none [-webkit-overflow-scrolling:touch]">
+      <nav className="sticky top-0 z-10 flex gap-0 overflow-x-auto border-b border-border bg-bg/95 backdrop-blur-sm scrollbar-none [-webkit-overflow-scrolling:touch]">
         {tabs.map((t, i) => {
           const isSecondary = i >= primaryTabs.length
           return (
@@ -401,8 +438,8 @@ export default function App() {
                 isSecondary ? 'font-medium' : 'font-bold'
               } ${
                 tab === t.id
-                  ? 'border-sand text-sand'
-                  : 'border-transparent text-muted/70 hover:text-bone-dark'
+                  ? 'border-rose text-rose-deep'
+                  : 'border-transparent text-muted/80 hover:text-ink'
               }`}
             >
               {t.label}
@@ -433,6 +470,5 @@ export default function App() {
         {import.meta.env.DEV && tab === 'local' && <LocalTab animal={animal} />}
       </main>
     </div>
-    </>
   )
 }

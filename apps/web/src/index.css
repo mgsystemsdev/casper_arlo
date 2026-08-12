@@ -1,86 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-sand: #C4946A;
-  --color-ochre: #B5722A;
-  --color-terracotta: #A0522D;
-  --color-deep-red: #7B3826;
-  --color-bone: #F2E8D9;
-  --color-bone-dark: #E0CEAE;
-  --color-charcoal: #2C201A;
-  --color-bark: #3D2B1F;
-  --color-olive: #6B7C45;
-  --color-sage: #8FA669;
-  --color-sky: #5B8FA8;
-  --color-muted: #9C8068;
-  --color-bg: #1a0e08;
-  --color-border: #4a3020;
-  --color-border-hi: #5a3a22;
-  --color-danger: #E08070;
-  --color-danger-bg: #3a1510;
-  --color-warn: #E8C080;
-  --color-warn-bg: #3a2a10;
-  --color-ok-bg: #1a3a20;
-  --color-accent-bg: #3a2414;
-  --color-chart: #C4946A;
-  --color-chart-grid: #9C8068;
+  --color-bg: #fff8f0;
+  --color-surface: #ffffff;
+  --color-ink: #4a3b3b;
+  --color-muted: #6f5a5b;
+  --color-blush: #f7c6d9;
+  --color-rose: #e8a0b8;
+  --color-rose-deep: #a84d6c;
+  --color-border: #f5dce4;
+  --color-ok: #3f6b52;
+  --color-ok-bg: #b8d8c5;
+  --color-warn: #9a5344;
+  --color-warn-bg: #f4b8a8;
+  --color-danger: #8b3d3d;
+  --color-danger-bg: #f2c4b6;
+  --color-accent-bg: #fdf0f5;
+  --color-ring: #a84d6c;
+  --color-chart: #e8a0b8;
+  --color-chart-grid: #c4a8ae;
   --font-display: "Playfair Display", serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: "Lato", sans-serif;
-}
-
-/* Casper — light pearl / blue (ball python) */
-html[data-theme="casper"] {
-  --color-sand: #2a5a8a;
-  --color-ochre: #3a72a8;
-  --color-terracotta: #4a8ab8;
-  --color-deep-red: #2a5a8a;
-  --color-bone: #1a2a3a;
-  --color-bone-dark: #2a3a4a;
-  --color-charcoal: #ffffff;
-  --color-bark: #eef4fa;
-  --color-olive: #3a8a5a;
-  --color-sage: #2f7a4e;
-  --color-sky: #4a8ab8;
-  --color-muted: #7a90a8;
-  --color-bg: #e8edf2;
-  --color-border: #dde4ec;
-  --color-border-hi: #c8d4e0;
-  --color-danger: #c44a3a;
-  --color-danger-bg: #f8e8e6;
-  --color-warn: #9a6a18;
-  --color-warn-bg: #f5edd8;
-  --color-ok-bg: #e4f0e8;
-  --color-accent-bg: #e4eef6;
-  --color-chart: #2a5a8a;
-  --color-chart-grid: #7a90a8;
-}
-
-/* Arlo — dark warm amber (crested gecko) */
-html[data-theme="arlo"] {
-  --color-sand: #C8943A;
-  --color-ochre: #a07028;
-  --color-terracotta: #E8C878;
-  --color-deep-red: #7a5828;
-  --color-bone: #F2E8D0;
-  --color-bone-dark: #D8C8A0;
-  --color-charcoal: #2e1e0c;
-  --color-bark: #261a0a;
-  --color-olive: #7aaa60;
-  --color-sage: #7aaa60;
-  --color-sky: #E8C878;
-  --color-muted: #8a7050;
-  --color-bg: #1a1008;
-  --color-border: #3e2a10;
-  --color-border-hi: #503818;
-  --color-danger: #E08070;
-  --color-danger-bg: #3a1510;
-  --color-warn: #E8C080;
-  --color-warn-bg: #3a2a10;
-  --color-ok-bg: #1a3a20;
-  --color-accent-bg: #3a2a10;
-  --color-chart: #C8943A;
-  --color-chart-grid: #8a7050;
 }
 
 html {
@@ -92,9 +33,8 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--color-bg);
-  color: var(--color-bone);
+  color: var(--color-ink);
   font-family: var(--font-sans);
-  transition: background 0.35s ease, color 0.35s ease;
 }
 
 #root {
@@ -102,8 +42,8 @@ body {
   min-height: 100dvh;
   display: flex;
   justify-content: center;
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 @media (max-width: 640px) {
@@ -131,40 +71,84 @@ body {
 }
 
 .pet-toggle {
-  position: fixed;
-  top: max(12px, env(safe-area-inset-top));
-  right: max(12px, env(safe-area-inset-right));
-  z-index: 50;
   display: flex;
+  width: 100%;
+  max-width: 22rem;
   gap: 0;
   padding: 3px;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--color-sand) 30%, transparent);
-  background: color-mix(in srgb, var(--color-charcoal) 88%, transparent);
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
 }
 
 .pet-toggle button {
+  flex: 1;
+  min-height: 44px;
   border: none;
   cursor: pointer;
-  padding: 7px 14px;
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-bone) 45%, transparent);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--color-muted);
   background: transparent;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
-html[data-theme="casper"] .pet-toggle button.active {
-  background: #dce8f2;
-  color: #1a3a5a;
+.pet-toggle button:hover:not(.active):not(:disabled) {
+  background: color-mix(in srgb, var(--color-blush) 40%, transparent);
+  color: var(--color-ink);
 }
 
-html[data-theme="arlo"] .pet-toggle button.active {
-  background: #503818;
-  color: #e8c878;
+.pet-toggle button.active {
+  background: var(--color-blush);
+  color: var(--color-ink);
+}
+
+.pet-toggle button:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--color-blush);
+  color: var(--color-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.reminder {
+  padding: 10px 0 10px 14px;
+  border-left: 3px solid var(--color-border);
+}
+
+.reminder-high {
+  border-left-color: var(--color-warn-bg);
+}
+
+.reminder-medium {
+  border-left-color: var(--color-rose);
+}
+
+.reminder-low {
+  border-left-color: transparent;
+  padding-left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
