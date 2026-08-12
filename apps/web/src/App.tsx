@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   api,
   clearToken,
@@ -7,6 +7,7 @@ import {
   mediaUrl,
   setActiveAnimalId,
   setToken,
+  todayStr,
   type AnimalOverview,
   type AnimalSummary,
   type Feed,
@@ -98,6 +99,76 @@ function daysUntilBirthday(dobIso: string): number {
     next = new Date(today.getFullYear() + 1, dob.getMonth(), dob.getDate())
   }
   return Math.round((next.getTime() - today.getTime()) / 86400000)
+}
+
+function HeroPortrait({
+  name,
+  url,
+  onChanged,
+}: {
+  name: string
+  url: string | null | undefined
+  onChanged: () => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function upload(file: File) {
+    setBusy(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      form.append('taken_at', todayStr())
+      form.append('kind', 'other')
+      form.append('caption', 'Profile')
+      const photo = await api.photos.upload(form)
+      await api.setHero(photo.id)
+      onChanged()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          e.target.value = ''
+          if (file) void upload(file)
+        }}
+      />
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => inputRef.current?.click()}
+        aria-label={url ? `Change ${name}'s profile photo` : `Add ${name}'s profile photo`}
+        title={url ? 'Change profile photo' : 'Add profile photo'}
+        className={`relative shrink-0 overflow-hidden rounded-lg border border-border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose disabled:opacity-60 ${
+          busy ? 'opacity-60' : ''
+        }`}
+      >
+        {url ? (
+          <img
+            src={mediaUrl(url)}
+            alt=""
+            className="h-16 w-16 object-cover sm:h-[88px] sm:w-[88px]"
+          />
+        ) : (
+          <div className="flex h-16 w-16 items-center justify-center bg-surface font-display text-xl text-muted sm:h-[88px] sm:w-[88px]">
+            {name.slice(0, 1)}
+          </div>
+        )}
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 bg-ink/55 py-0.5 text-center font-mono text-[9px] uppercase tracking-wide text-bg">
+          {busy ? '…' : url ? 'Change' : 'Add'}
+        </span>
+      </button>
+    </>
+  )
 }
 
 export default function App() {
@@ -295,20 +366,7 @@ export default function App() {
 
         <div className="mt-5 flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-            {animal.hero_photo_url ? (
-              <img
-                src={mediaUrl(animal.hero_photo_url)}
-                alt={animal.name}
-                className="h-16 w-16 shrink-0 rounded-lg border border-border object-cover sm:h-[88px] sm:w-[88px]"
-              />
-            ) : (
-              <div
-                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-border bg-surface font-display text-xl text-muted sm:h-[88px] sm:w-[88px]"
-                aria-hidden
-              >
-                {animal.name.slice(0, 1)}
-              </div>
-            )}
+            <HeroPortrait name={animal.name} url={animal.hero_photo_url} onChanged={() => void refresh()} />
             <div className="min-w-0">
             <h1 className="font-display text-[1.85rem] font-semibold leading-none tracking-tight text-ink sm:text-[2.15rem]">
               {animal.name}
