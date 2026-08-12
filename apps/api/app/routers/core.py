@@ -5,8 +5,15 @@ from app.auth import create_token, require_auth, token_expires_at
 from app.config import get_settings
 from app.db import get_db
 from app.deps import AnimalId
-from app.schemas import LoginRequest, TokenResponse
-from app.services.care import animal_summary, build_overview, calc_age, get_animal, list_animals
+from app.schemas import AnimalHeroUpdate, LoginRequest, TokenResponse
+from app.services.care import (
+    animal_summary,
+    build_overview,
+    calc_age,
+    get_animal,
+    list_animals,
+    set_animal_hero,
+)
 from app.services.feeding_rules import feeding_config, recommend_feeding
 from app.services.species_packs import resolve_species_key
 
@@ -22,7 +29,7 @@ def login(body: LoginRequest) -> TokenResponse:
 
 @router.get("/animals")
 def animals_list(_: None = Depends(require_auth), db: Session = Depends(get_db)):
-    return [animal_summary(a) for a in list_animals(db)]
+    return [animal_summary(a, db) for a in list_animals(db)]
 
 
 @router.get("/animal")
@@ -35,6 +42,23 @@ def animal_overview(
         return build_overview(db, aid)
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.patch("/animal")
+def patch_animal(
+    body: AnimalHeroUpdate,
+    aid: AnimalId,
+    _: None = Depends(require_auth),
+    db: Session = Depends(get_db),
+):
+    animal = get_animal(db, aid)
+    if animal is None:
+        raise HTTPException(status_code=404, detail="No animal")
+    try:
+        set_animal_hero(db, animal, body.hero_photo_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return build_overview(db, aid)
 
 
 @router.get("/feeding/config")

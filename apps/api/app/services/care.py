@@ -1,4 +1,5 @@
 from datetime import date, datetime, time, timedelta
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -12,6 +13,7 @@ from app.models import (
     Handling,
     Maintenance,
     MaintenanceKind,
+    Photo,
     Regurgitation,
     ShedCycle,
     ShedStatus,
@@ -81,9 +83,43 @@ def list_animals(db: Session) -> list[Animal]:
     return list(db.scalars(select(Animal).order_by(Animal.id)))
 
 
-def animal_summary(animal: Animal) -> dict[str, Any]:
+def photo_public_url(file_path: str | None) -> str | None:
+    if not file_path:
+        return None
+    return f"/uploads/{Path(file_path).name}"
+
+
+def hero_fields(db: Session, animal: Animal) -> dict[str, Any]:
+    url = None
+    if animal.hero_photo_id:
+        photo = db.get(Photo, animal.hero_photo_id)
+        if photo is not None and photo.animal_id == animal.id:
+            url = photo_public_url(photo.file_path)
+    return {"hero_photo_id": animal.hero_photo_id, "hero_photo_url": url}
+
+
+def set_animal_hero(db: Session, animal: Animal, photo_id: int | None) -> Animal:
+    if photo_id is None:
+        animal.hero_photo_id = None
+        db.commit()
+        db.refresh(animal)
+        return animal
+    photo = db.get(Photo, photo_id)
+    if photo is None or photo.animal_id != animal.id:
+        raise ValueError("Photo not found")
+    animal.hero_photo_id = photo_id
+    db.commit()
+    db.refresh(animal)
+    return animal
+
+
+def animal_summary(animal: Animal, db: Session | None = None) -> dict[str, Any]:
     pack_key = resolve_species_key(animal.species, animal.name)
     pack = get_pack(pack_key)
+    hero = hero_fields(db, animal) if db is not None else {
+        "hero_photo_id": animal.hero_photo_id,
+        "hero_photo_url": None,
+    }
     return {
         "id": animal.id,
         "name": animal.name,
@@ -95,6 +131,7 @@ def animal_summary(animal: Animal) -> dict[str, Any]:
         "status": animal.status,
         "species_key": pack_key,
         "theme": pack["theme"],
+        **hero,
     }
 
 
@@ -675,6 +712,7 @@ def build_overview(db: Session, animal_id: int | None = None) -> dict[str, Any]:
         "status": animal.status,
         "species_key": pack_key,
         "species_pack": pack_public(pack),
+        **hero_fields(db, animal),
         "age": age,
         "stage": stage,
         "prey_categories": prey_cfg["prey_categories"],

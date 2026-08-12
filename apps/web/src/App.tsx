@@ -4,25 +4,29 @@ import {
   clearToken,
   getActiveAnimalId,
   getToken,
+  mediaUrl,
   setActiveAnimalId,
   setToken,
   type AnimalOverview,
   type AnimalSummary,
   type Feed,
-  type Reminder,
 } from './api/client'
 import { JournalTab, LocalTab, PhotosTab, SettingsTab } from './components/ExtrasTabs'
 import { FeedingTab } from './components/FeedingTab'
 import { HabitatTab } from './components/HabitatTab'
 import { HandlingTab } from './components/HandlingTab'
 import { HealthTab } from './components/HealthTab'
+import { LogsTab } from './components/LogsTab'
 import { OverviewTab } from './components/OverviewTab'
 import { PreyTab, SpeciesTab } from './components/StaticTabs'
+import { StatsTab } from './components/StatsTab'
 import { Btn, Field, Input } from './components/ui'
 import { useCountdown } from './hooks/useCountdown'
 
 type TabId =
   | 'overview'
+  | 'logs'
+  | 'stats'
   | 'feeding'
   | 'handling'
   | 'prey'
@@ -94,39 +98,6 @@ function daysUntilBirthday(dobIso: string): number {
     next = new Date(today.getFullYear() + 1, dob.getMonth(), dob.getDate())
   }
   return Math.round((next.getTime() - today.getTime()) / 86400000)
-}
-
-function reminderLabel(severity: string) {
-  if (severity === 'high') return 'Needs attention'
-  if (severity === 'medium') return 'Due soon'
-  return 'Note'
-}
-
-function ReminderList({ reminders }: { reminders: Reminder[] }) {
-  if (!reminders.length) return null
-  return (
-    <section className="mt-5 space-y-1" aria-label="Care reminders">
-      {reminders.map((r) => {
-        const tone =
-          r.severity === 'high' ? 'reminder-high' : r.severity === 'medium' ? 'reminder-medium' : 'reminder-low'
-        return (
-          <div key={r.kind + r.message} className={`reminder ${tone}`}>
-            <div
-              className={`font-mono text-[10px] font-bold uppercase tracking-[0.1em] ${
-                r.severity === 'high' ? 'text-warn' : r.severity === 'medium' ? 'text-rose-deep' : 'text-muted'
-              }`}
-            >
-              {reminderLabel(r.severity)}
-            </div>
-            <div className={`mt-0.5 text-[13px] leading-snug ${r.severity === 'high' ? 'text-warn' : 'text-ink'}`}>
-              {r.message}
-            </div>
-            {r.why && <div className="mt-0.5 text-[11px] leading-relaxed text-muted">{r.why}</div>}
-          </div>
-        )
-      })}
-    </section>
-  )
 }
 
 export default function App() {
@@ -222,6 +193,8 @@ export default function App() {
   const pack = animal.species_pack
   const primaryTabs: { id: TabId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
+    { id: 'logs', label: 'Logs' },
+    { id: 'stats', label: 'Stats' },
     { id: 'feeding', label: 'Feeding' },
     { id: 'handling', label: 'Handling' },
     { id: 'prey', label: pack.guide_label },
@@ -294,8 +267,6 @@ export default function App() {
       : 'No drop'
     : animal.last_shed?.quality || 'None'
 
-  const mastheadReminders = animal.reminders.filter((r) => r.severity === 'high' || r.severity === 'medium')
-
   return (
     <div className="w-full max-w-[1100px] text-ink">
       <header className="px-4 pb-6 pt-5 sm:px-7 sm:pt-8">
@@ -323,7 +294,22 @@ export default function App() {
         )}
 
         <div className="mt-5 flex items-start justify-between gap-4">
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-start gap-3 sm:gap-4">
+            {animal.hero_photo_url ? (
+              <img
+                src={mediaUrl(animal.hero_photo_url)}
+                alt={animal.name}
+                className="h-16 w-16 shrink-0 rounded-lg border border-border object-cover sm:h-[88px] sm:w-[88px]"
+              />
+            ) : (
+              <div
+                className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-border bg-surface font-display text-xl text-muted sm:h-[88px] sm:w-[88px]"
+                aria-hidden
+              >
+                {animal.name.slice(0, 1)}
+              </div>
+            )}
+            <div className="min-w-0">
             <h1 className="font-display text-[1.85rem] font-semibold leading-none tracking-tight text-ink sm:text-[2.15rem]">
               {animal.name}
             </h1>
@@ -344,6 +330,7 @@ export default function App() {
                   ? ` · ${animal.age.months} mo · birthday today`
                   : ` · ${animal.age.months} mo · born ${formatDob(animal.dob)}`}
               </span>
+            </div>
             </div>
           </div>
           <div className="shrink-0 pt-1 text-right">
@@ -422,8 +409,6 @@ export default function App() {
             </dd>
           </div>
         </dl>
-
-        <ReminderList reminders={mastheadReminders} />
       </header>
 
       <nav className="sticky top-0 z-10 flex gap-0 overflow-x-auto border-b border-border bg-bg/95 backdrop-blur-sm scrollbar-none [-webkit-overflow-scrolling:touch]">
@@ -450,6 +435,8 @@ export default function App() {
 
       <main className="px-4 pb-10 pt-5 sm:px-7 sm:pb-9 sm:pt-6">
         {tab === 'overview' && <OverviewTab animal={animal} feeds={feeds} onChange={refresh} />}
+        {tab === 'logs' && <LogsTab animal={animal} onChange={refresh} />}
+        {tab === 'stats' && <StatsTab animal={animal} onChange={refresh} />}
         {tab === 'feeding' && <FeedingTab animal={animal} onChange={refresh} />}
         {tab === 'handling' && <HandlingTab animal={animal} onChange={refresh} />}
         {tab === 'prey' && <PreyTab animal={animal} />}

@@ -80,6 +80,11 @@ export const api = {
     ),
   animals: () => request<AnimalSummary[]>('/api/animals', {}, false),
   animal: () => request<AnimalOverview>('/api/animal'),
+  setHero: (hero_photo_id: number | null) =>
+    request<AnimalOverview>('/api/animal', {
+      method: 'PATCH',
+      body: JSON.stringify({ hero_photo_id }),
+    }),
   feeding: {
     config: () => request<FeedingConfig>('/api/feeding/config'),
     recommend: (prey?: string | null) => {
@@ -250,6 +255,8 @@ export type AnimalSummary = {
   status: string
   species_key: string
   theme: string
+  hero_photo_id?: number | null
+  hero_photo_url?: string | null
 }
 
 export type SpeciesPack = {
@@ -332,6 +339,8 @@ export type AnimalOverview = {
   owner: string
   status: string
   species_key: string
+  hero_photo_id: number | null
+  hero_photo_url: string | null
   species_pack: SpeciesPack
   age: { months: number; days: number; total: number }
   stage: { label: string; desc: string; feed_interval_days: number }

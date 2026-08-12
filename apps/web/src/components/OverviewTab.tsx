@@ -5,6 +5,7 @@ import {
   type AnimalOverview,
   type Feed,
   type PreyStatus,
+  type Reminder,
 } from '../api/client'
 import {
   Alert,
@@ -37,6 +38,49 @@ const STATUS_CLASS: Record<PreyStatus, string> = {
   too_small: 'text-warn',
   too_large: 'text-danger',
   unknown: 'text-muted',
+}
+
+type DueGroupId = 'weight' | 'feeding' | 'handling' | 'shed' | 'habitat' | 'maintenance'
+
+function reminderGroup(kind: string): DueGroupId | null {
+  if (kind === 'handle_wait') return null
+  if (kind.startsWith('weight')) return 'weight'
+  if (kind.startsWith('feed_')) return 'feeding'
+  if (kind.startsWith('handling')) return 'handling'
+  if (kind.startsWith('shed')) return 'shed'
+  if (kind.startsWith('env_')) return 'habitat'
+  if (kind.startsWith('maint')) return 'maintenance'
+  return null
+}
+
+function groupedDueReminders(reminders: Reminder[], feedingLabel: string) {
+  const order: { id: DueGroupId; label: string }[] = [
+    { id: 'weight', label: 'Weight' },
+    { id: 'feeding', label: feedingLabel },
+    { id: 'handling', label: 'Handling' },
+    { id: 'shed', label: 'Shed' },
+    { id: 'habitat', label: 'Habitat' },
+    { id: 'maintenance', label: 'Maintenance' },
+  ]
+  const buckets = new Map<DueGroupId, Reminder[]>()
+  const other: Reminder[] = []
+  for (const r of reminders) {
+    const g = reminderGroup(r.kind)
+    if (!g) {
+      if (r.kind !== 'handle_wait') other.push(r)
+      continue
+    }
+    const list = buckets.get(g) ?? []
+    list.push(r)
+    buckets.set(g, list)
+  }
+  return {
+    groups: order.filter((g) => buckets.has(g.id)).map((g) => ({
+      ...g,
+      items: buckets.get(g.id) ?? [],
+    })),
+    other,
+  }
 }
 
 export function OverviewTab({
@@ -92,63 +136,94 @@ export function OverviewTab({
   const iv = fr.feeding_interval
   const pack = animal.species_pack
   const isPrey = pack.food_noun === 'prey'
+  const feedingLabel = isPrey ? 'Feeding' : 'Meals'
+  const due = groupedDueReminders(animal.reminders, feedingLabel)
 
   return (
     <div>
-      {animal.reminders.some((r) => r.severity === 'low') && (
-        <>
-          <SectionLabel>Notes</SectionLabel>
-          <div className="mb-1 space-y-2">
-            {animal.reminders
-              .filter((r) => r.severity === 'low')
-              .map((r) => (
-                <p key={r.kind + r.message} className="text-[13px] leading-relaxed text-muted">
-                  {r.message}
-                  {r.why ? <span className="mt-0.5 block text-[11px]">{r.why}</span> : null}
-                </p>
-              ))}
+      <div className="mb-4 grid gap-6 sm:grid-cols-2">
+        <section aria-label="Due soon">
+          <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
+            Due soon
           </div>
-        </>
-      )}
+          {due.groups.length === 0 && due.other.length === 0 ? (
+            <p className="text-[13px] text-muted">Nothing due</p>
+          ) : (
+            <div className="space-y-3">
+              {due.groups.map((g) => (
+                <div key={g.id}>
+                  <div className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-rose-deep">
+                    {g.label}
+                  </div>
+                  <ul className="mt-1 space-y-1.5">
+                    {g.items.map((r) => (
+                      <li key={r.kind + r.message}>
+                        <div
+                          className={`text-[13px] leading-snug ${
+                            r.severity === 'high' ? 'font-semibold text-warn' : 'text-ink'
+                          }`}
+                        >
+                          {r.message}
+                        </div>
+                        {r.why ? <div className="mt-0.5 text-[11px] text-muted">{r.why}</div> : null}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              {due.other.length > 0 && (
+                <ul className="space-y-1.5">
+                  {due.other.map((r) => (
+                    <li key={r.kind + r.message}>
+                      <div className="text-[13px] leading-snug text-ink">{r.message}</div>
+                      {r.why ? <div className="mt-0.5 text-[11px] text-muted">{r.why}</div> : null}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </section>
 
-      <SectionLabel>Feeding recommendation · {fr.stage}</SectionLabel>
-      <div className="mb-1 max-w-2xl">
-        <p className="text-[15px] leading-snug text-ink">
-          Every{' '}
-          <span className="font-display text-[1.35rem] font-semibold text-rose-deep">
-            {next?.interval_days ?? iv.recommended_days}d
-          </span>
-          <span className="text-muted">
-            {' '}
-            · safe {iv.min_days}–{iv.max_days}d
-            {next?.interval_source ? ` · ${next.interval_source}` : ''}
-          </span>
-        </p>
-        <p className="mt-2 text-[13px] leading-relaxed text-ink">
-          Suggested: {fr.suggested_prey ?? fr.recommended_prey[0] ?? '—'}
-          {fr.suggestion_why ? ` — ${fr.suggestion_why}` : ''}
-        </p>
-        <p className="mt-1 text-[12px] leading-relaxed text-muted">
-          Stage band: {fr.recommended_prey.join(', ')}. Handle after feed:{' '}
-          {animal.clear_to_handle.clear_after_hours}h timer. Overdue feeds don&apos;t stretch the next gap.
-        </p>
-        {next?.interval_why && (
-          <p className="mt-1 text-[11px] text-muted">{next.interval_why}</p>
-        )}
-        {animal.last_feed && fr.prey_status && (
-          <p className={`mt-2 text-[12px] ${STATUS_CLASS[fr.prey_status]}`}>
-            Last {isPrey ? 'prey' : 'food'} ({animal.last_feed.prey_type}): {STATUS_LABEL[fr.prey_status]}
-            {animal.last_feed.date ? ` · ${animal.last_feed.date}` : ''}
-          </p>
-        )}
-        {animal.shed_prediction?.estimate_date && (
-          <p className="mt-1 text-[12px] text-muted">
-            Next shed ~{animal.shed_prediction.estimate_date}
-            {animal.shed_prediction.median_days != null
-              ? ` (median ${animal.shed_prediction.median_days}d cycles)`
-              : ''}
-          </p>
-        )}
+        <section aria-label={`${feedingLabel} recommendation`}>
+          <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
+            {feedingLabel} · {fr.stage}
+          </div>
+          <ul className="list-disc space-y-1.5 pl-4 text-[13px] leading-snug text-ink">
+            <li>
+              Every {next?.interval_days ?? iv.recommended_days}d
+              <span className="text-muted">
+                {' '}
+                · safe {iv.min_days}–{iv.max_days}d
+                {next?.interval_source ? ` · ${next.interval_source}` : ''}
+              </span>
+            </li>
+            <li>
+              Handle {animal.clear_to_handle.clear_after_hours}h after {isPrey ? 'feed' : 'meal'}.
+              Overdue {isPrey ? 'feeds' : 'meals'} don&apos;t stretch the next gap.
+            </li>
+            {next?.interval_why ? <li className="text-muted">{next.interval_why}</li> : null}
+            <li>
+              Suggested: {fr.suggested_prey ?? fr.recommended_prey[0] ?? '—'}
+              {fr.suggestion_why ? ` — ${fr.suggestion_why}` : ''}
+            </li>
+            <li>Stage band: {fr.recommended_prey.join(', ')}</li>
+            {animal.last_feed && fr.prey_status ? (
+              <li className={STATUS_CLASS[fr.prey_status]}>
+                Last {isPrey ? 'prey' : 'food'} ({animal.last_feed.prey_type}): {STATUS_LABEL[fr.prey_status]}
+                {animal.last_feed.date ? ` · ${animal.last_feed.date}` : ''}
+              </li>
+            ) : null}
+            {animal.shed_prediction?.estimate_date ? (
+              <li className="text-muted">
+                Next shed ~{animal.shed_prediction.estimate_date}
+                {animal.shed_prediction.median_days != null
+                  ? ` (median ${animal.shed_prediction.median_days}d)`
+                  : ''}
+              </li>
+            ) : null}
+          </ul>
+        </section>
       </div>
 
       {animal.shed_mode.active && (
